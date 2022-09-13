@@ -1,3 +1,4 @@
+from typing import Optional
 
 class API:
   VERSION: int

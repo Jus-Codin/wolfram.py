@@ -2,8 +2,8 @@ from json import JSONDecodeError
 from urllib.parse import urlencode
 from typing import Dict, Tuple, overload
 
-from .api import API
-from .models import WolframRequest
+from wolfram.api import API
+from wolfram.models import WolframRequest
 
 import requests
 
