@@ -4,29 +4,53 @@ Typed dictionary of every single model in the API
 
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional, TypedDict, Union
+from typing import Literal, Mapping, Optional, Sequence, TypedDict, Union
 
 class WolframDict(TypedDict):
   pass
 
 class FullResultsDict(WolframDict):
   success: bool
-
-  languagemsg: Optional[str]
-  futuretopic: Optional[str] # I'm not too sure what format this is, so I'll assume it's a string
   error: Union[ErrorDict, Literal[False]]
 
   numpods: int
   timing: float
+
+  tips: TipsDict
 
   recalculate: Optional[str]
 
   id: str
   host: str
 
-  pods: List[PodDict]
+  pods: Sequence[PodDict, ...]
 
-  tips: Dict[str, str] # I would assume so...
+  assumptions: AssumptionsDict
+
+  warnings: Union[
+    Sequence[
+      Union[SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict], ...
+    ],
+    SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict
+  ]
+
+  sources: Union[
+    Sequence[
+      SourceDict
+    ],
+    SourceDict
+  ]
+
+  # When queries don't return pods
+  languagemsg: LanguageMsgDict
+  futuretopic: FutureTopicDict
+  examplepage: ExamplePageDict
+  generalization: GeneralizationDict
+  didyoumeans: Union[
+    Sequence[DidYouMeanDict, ...],
+    DidYouMeanDict
+  ]
+
   
 class ConversationalResultsDict(WolframDict):
   """The response when using the Conversational API"""
@@ -39,20 +63,23 @@ class ConversationalResultsDict(WolframDict):
 
 class PodDict(WolframDict):
   title: str
+  primary: Optional[Literal[True]]
   error: Union[ErrorDict, Literal[False]]
   position: int
   id: str
   numsubpods: int
+  subpods: Sequence[SubPodDict, ...]
+
+
 
 class SubPodDict(WolframDict):
   title: Optional[str]
-  plaintext: str
-  img: ImageDict
+  img: Optional[ImageDict]
+  plaintext: Optional[str]
 
-class ErrorDict(WolframDict):
-  # In the API specification it claims that this is an integer, however it is a string
-  code: str 
-  msg: str
+
+
+# Subpod data types
 
 class ImageDict(WolframDict):
   src: str
@@ -62,3 +89,105 @@ class ImageDict(WolframDict):
   height: int
   themes: str
   contenttype: str
+
+class AudioDict(WolframDict):
+  url: str
+  type: str
+
+
+
+# Assumptions
+
+class AssumptionsDict(WolframDict):
+  type: str
+  word: str
+  template: str
+  count: int
+  values: Sequence[AssumptionDict, ...]
+
+class AssumptionDict(WolframDict):
+  name: str
+  desc: str
+  input: str
+
+
+
+# Warnings
+
+class WarningDict(WolframDict):
+  text: str
+
+class SpellCheckWarningDict(WarningDict):
+  word: str
+  suggestion: str
+
+class DelimiterWarningDict(WarningDict):
+  pass
+
+class TranslationWarningDict(WarningDict):
+  phrase: str
+  trans: str
+  lang: str
+
+class AlternativeDict(WolframDict):
+  score: str
+  level: str
+  val: str
+
+class ReinterpretWarningDict(WarningDict):
+  new: str
+  score: str
+  level: str
+  alternative: Optional[
+    Union[
+      Sequence[
+        AlternativeDict, ...
+      ],
+      AlternativeDict
+    ]
+  ]
+
+
+
+# Queries that are not understood
+
+class DidYouMeanDict(WolframDict):
+  score: str # Another example of a wrong data type used by the API...
+  level: str
+  val: str
+
+class LanguageMsgDict(WolframDict):
+  english: str
+  other: str
+
+class FutureTopicDict(WolframDict):
+  topic: str
+  msg: str
+
+class ExamplePageDict(WolframDict):
+  category: str
+  url: str
+
+class TipsDict(WolframDict):
+  text: str
+
+class GeneralizationDict(WolframDict):
+  topic: str
+  desc: str
+  url: str
+
+
+
+# Errors usually caused by appids
+
+class ErrorDict(WolframDict):
+  code: str # In the API specification it claims that this is an integer, however it is a string
+  msg: str
+
+
+
+# Sources
+
+class SourceDict(WolframDict):
+  url: str
+  text: str

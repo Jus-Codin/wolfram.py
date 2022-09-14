@@ -56,8 +56,7 @@ class Model(Generic[ModT]):
     """Returns the raw dictionary of the model"""
     return self._raw if self._raw is not None else self._to_dict
 
-class Error(Model):
+class Error(Model[ErrorDict]):
   _raw_type = ErrorDict
   msg: str
   code = field(default_factory=int)
-
