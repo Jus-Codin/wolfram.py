@@ -18,7 +18,7 @@ class FullResultsDict(WolframDict):
 
   tips: TipsDict
 
-  recalculate: Optional[str]
+  recalculate: Union[str, Literal[""]]
 
   id: str
   host: str
