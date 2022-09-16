@@ -4,7 +4,7 @@ data classes are here
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import Field, dataclass, field
 from typing import (
   Any,
   Callable,
@@ -16,12 +16,16 @@ from typing import (
   Mapping,
   Optional,
   Sequence,
+  TYPE_CHECKING,
   TypeVar,
   Union
 )
 
 from wolfram.types import *
 from wolfram.utils import optional_factory, list_map_factory, always_list_factory
+
+if TYPE_CHECKING:
+  from dataclasses import Field
 
 DictT = TypeVar("DictT", bound=WolframDict)
 
@@ -66,10 +70,27 @@ class WolframURL:
 
 
 
+def model_field(factory: Optional[Callable] = None, **kwargs) -> Field:
+  return field(
+    metadata={"factory": factory},
+    **kwargs
+  )
+
+def optional_field(default=None, **kwargs) -> Field:
+  return model_field(default=None, **kwargs)
+
 @dataclass
 class Model(Generic[DictT]):
   """The base class of all Wolfram|Alpha models"""
   _raw: DictT = None
+
+  def __post_init__(self):
+    for attr, field in self.__dataclass_fields__.items():
+      # This is a little hacky, but no better way to do this with dataclasses
+      factory = field.metadata.get("factory") 
+      if factory is not None:
+        val = getattr(self, attr)
+        setattr(self, attr, factory(val))
 
   @classmethod
   def from_dict(cls, raw: DictT):
@@ -107,8 +128,8 @@ class Image(Model[ImageDict]):
   title: str
   width: int
   height: int
-  themes = field(
-    default_factory=lambda seq: [
+  themes: Sequence[int, ...] = model_field(
+    factory=lambda seq: [
       int(ele) for ele in seq.split(",")
     ]
   )
@@ -116,7 +137,7 @@ class Image(Model[ImageDict]):
 @dataclass
 class Audio(Model[AudioDict]):
   type: str
-  url = field(default_factory=WolframURL)
+  url: WolframURL = model_field(factory=WolframURL)
 
 
 
@@ -134,8 +155,8 @@ class AssumptionsCollection(Model[AssumptionsDict]):
   word: str
   template: str
   count: int
-  values = field(
-    default_factory=list_map_factory(
+  values: Sequence[Assumption, ...] = model_field(
+    factory=list_map_factory(
       Assumption.from_dict
     )
   )
@@ -182,15 +203,15 @@ class TranslationWarning(Warning[TranslationWarningDict]):
 class Alternative(Model[AlternativeDict]):
   level: str
   val: str
-  score = field(default_factory=float)
+  score: float = model_field(factory=float)
 
 @dataclass
 class ReinterpretWarning(Model[ReinterpretWarningDict]):
   new: str
   level: str
-  score = field(default_factory=float)
-  alternative = field(
-    default_factory=_always_list_factory(
+  score: float = model_field(factory=float)
+  alternative: Sequence[Alternative, ...] = model_field(
+    factory=always_list_factory(
       Alternative.from_dict
     )
   )
@@ -203,7 +224,7 @@ class ReinterpretWarning(Model[ReinterpretWarningDict]):
 class DidYouMean(Model[DidYouMeanDict]):
   level: str
   val: str
-  score = field(default_factory=float)
+  score: float = model_field(factory=float)
 
 @dataclass
 class LanguageMsg(Model[LanguageMsgDict]):
@@ -218,7 +239,7 @@ class FutureTopic(Model[FutureTopicDict]):
 @dataclass
 class ExamplePage(Model[ExamplePageDict]):
   category: str
-  url = field(default_factory=WolframURL)
+  url: WolframURL = model_field(factory=WolframURL)
 
 @dataclass
 class Tip(Model[TipsDict]):
@@ -228,7 +249,7 @@ class Tip(Model[TipsDict]):
 class Generalization(Model[GeneralizationDict]):
   topic: str
   desc: str
-  url = field(default_factory=WolframURL)
+  url: WolframURL = model_field(factory=WolframURL)
 
 
 
@@ -237,7 +258,7 @@ class Generalization(Model[GeneralizationDict]):
 @dataclass
 class Error(Model[ErrorDict]):
   msg: str
-  code = field(default_factory=int)
+  code: int = model_field(factory=int)
 
 
 
@@ -246,7 +267,7 @@ class Error(Model[ErrorDict]):
 @dataclass
 class Source(Model[SourceDict]):
   text: str
-  url = field(default_factory=WolframURL)
+  url: WolframURL = model_field(factory=WolframURL)
 
 
 
@@ -254,8 +275,8 @@ class Source(Model[SourceDict]):
 class SubPod(Model[SubPodDict]):
   title: str
   plaintext: Optional[str]
-  img: Optional[Image] = field(
-    default_factory=optional_factory(
+  img: Optional[Image] = optional_field(
+    factory=optional_factory(
       Image.from_dict
     )
   )
@@ -269,14 +290,14 @@ class Pod(Model[PodDict]):
   id: str
   numsubpods: int
   primary: Optional[Literal[True]] = None
-  error: Optional[Error] = field(
-    default_factory=optional_factory(
+  error: Optional[Error] = model_field(
+    factory=optional_factory(
       Error.from_dict,
       match=False
     )
   )
-  subpods = field(
-    default_factory=list_map_factory(
+  subpods: Sequence[SubPod, ...] = model_field(
+    factory=list_map_factory(
       SubPod.from_dict
     )
   )
@@ -292,47 +313,47 @@ class FullResults(Model[FullResultsDict]):
   id: str
   host: str
 
-  tips = field(
-    default_factory=always_list_factory(
+  tips: Sequence[Tip, ...] = model_field(
+    factory=always_list_factory(
       Tip.from_dict
     )
   )
 
-  recalculate: Optional[WolframURL] = field(
-    default_factory=optional_factory(
+  recalculate: Optional[WolframURL] = model_field(
+    factory=optional_factory(
       WolframURL,
       match=""
     )
   )
-  pods = field(
-    default_factory=list_map_factory(
+  pods: Sequence[Pod, ...] = model_field(
+    factory=list_map_factory(
       Pod.from_dict
     )
   )
   assumptions: Optional[AssumptionsCollection] = None
-  warnings: Optional[Warning] = field(
-    default_factory=Warning.to_subclass
+  warnings: Optional[Warning] = model_field(
+    factory=Warning.to_subclass
   )
-  sources = field(
-    default_factory=always_list_factory(
+  sources: Sequence[Source] = model_field(
+    factory=always_list_factory(
       Source.from_dict
     )
   )
 
-  languagemsg: Optional[LanguageMsg] = field(
-    default_factory=LanguageMsg.from_dict
+  languagemsg: Optional[LanguageMsg] = model_field(
+    factory=LanguageMsg.from_dict
   )
-  futuretopic: Optional[FutureTopic] = field(
-    default_factory=FutureTopic.from_dict
+  futuretopic: Optional[FutureTopic] = model_field(
+    factory=FutureTopic.from_dict
   )
-  examplepage: Optional[ExamplePage] = field(
-    default_factory=ExamplePage.from_dict
+  examplepage: Optional[ExamplePage] = model_field(
+    factory=ExamplePage.from_dict
   )
-  generalization: Optional[Generalization] = field(
-    default_factory=Generalization.from_dict
+  generalization: Optional[Generalization] = model_field(
+    factory=Generalization.from_dict
   )
-  didyoumeans = field(
-    default_factory=always_list_factory(
+  didyoumeans: Sequence[DidYouMean] = model_field(
+    factory=always_list_factory(
       DidYouMean.from_dict
     )
   )
@@ -344,4 +365,4 @@ class ConversationalResults(Model[ConversationalResultsDict]):
   result: str
   conversationID: str
   host: str
-  s: Optional[int] = int
+  s: Optional[int] = optional_field()
