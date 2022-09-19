@@ -57,16 +57,15 @@ class WolframURL:
 
   @property
   def params(self) -> Mapping[str, str]:
-    return {
-      v[0]: v[1]
-      for v in map(
-        str.split, self.query.split("&")
-      )
-    }
+    d = {}
+    for param in self.query.split("&"):
+      k, v = param.split("=")
+      d[k] = v
+    return d
 
   @property
   def url(self) -> str:
-    return self.path + self.query
+    return self.path + "?" + self.query
 
 
 
