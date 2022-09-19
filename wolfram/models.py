@@ -108,11 +108,14 @@ class Model(Generic[DictT]):
   def _to_dict(self) -> DictT:
     """Returns the model with it's values in a dictionary excluding private variables,
     not to be called directly"""
-    return {
-      k: getattr(self, k)
-      for k in self.__dataclass_fields__.keys()
-      if not k.startswith("_")
-    }
+    d = {}
+    for k in self.__dataclass_fields__.keys():
+      if not k.startswith("_"):
+        if isinstance(k, Model):
+          d[k] = getattr(self, k).raw
+        else:
+          d[k] = getattr(self, k)
+    return d
 
   @property
   def raw(self) -> DictT:
