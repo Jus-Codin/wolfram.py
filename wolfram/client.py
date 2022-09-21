@@ -1,66 +1,88 @@
 from json import JSONDecodeError
 from urllib.parse import urlencode
-from typing import Dict, Tuple, overload
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, Tuple
 
-from wolfram.api import API
-from wolfram.models import WolframRequest
+from wolfram.api import FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
+from wolfram.models import FullResults, WolframRequest
 
+if TYPE_CHECKING:
+  from aiohttp import ClientResponse
+  from requests import Response
+
+  from wolfram.api import API
+
+import aiohttp
 import requests
 
-class ClientABC:
-  """The abstract base class of Clients"""
+class ClientBase:
+  """The base class of Clients"""
+  BASE_URL = "https://api.wolframalpha.com/"
 
   API_VERSION = {
     1: "v1/",
     2: "v2/"
   }
 
-  def __init__(self, appid: str, api: API, base_url: str = None):
-    self._api = api
+  def __init__(self, appid: str, base_url: str = None):
     self._appid = appid
-
-  @property
-  def api(self) -> API:
-    """The API that this client is using"""
-    return self._api
 
   @property
   def appid(self) -> str:
     """The App ID in use by the client"""
     return self._appid
 
-  def _check_request(self, request: WolframRequest):
-    if request.version not in self.API_VERSION.keys():
-      raise ValueError(f"Unknown API version '{request.version}'.")
-
-  def _send_request(self, request: WolframRequest):
-    raise NotImplementedError
-
-  def _create_request(self, **params) -> WolframRequest:
-    return WolframRequest(version=self.api.VERSION, endpoint=self.api.ENDPOINT, params=params)
-
-  def query(self): # TODO
-    raise NotImplementedError
 
 
-
-class Client(ClientABC):
+class Client(ClientBase):
   """Client to interact with the APIs"""
 
-  def _send_request(self, request: WolframRequest) -> dict:
-    self._check_request(request)
-    api_version = self.API_VERSION[request.version]
+  def query(self, api: API, **params):
+    if not isinstance(api, API):
+      raise TypeError("api must be `API` type")
+
+
+    if api.VERSION not in self.API_VERSION.keys():
+      raise ValueError(f"Unknown API version '{request.version}'.")
+
+    api_version = self.API_VERSION[api.VERSION]
 
     params = "?" + urlencode(
       tuple(
-        dict(appid=self.appid, **request.params).items()
+        dict(appid=self.appid, **params).items()
       )
     )
-    url = request.base_url + api_version + endpoint + params
+    url = self.BASE_URL + api_version + api.ENDPOINT + params
     resp = requests.get(url)
-    return resp
+    return api.format_results(resp)
+
+  def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
+    return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
 
 
 
-class AsyncClient(ClientABC):
-  ...
+class AsyncClient(ClientBase):
+  """Async client to interact with the APIs, powered by aiohttp"""
+
+  async def query(self, api: API, **params):
+    if not isinstance(api, API):
+      raise TypeError("api must be `API` type")
+
+
+    if api.VERSION not in self.API_VERSION.keys():
+      raise ValueError(f"Unknown API version '{request.version}'.")
+
+    api_version = self.API_VERSION[api.VERSION]
+
+    params = "?" + urlencode(
+      tuple(
+        dict(appid=self.appid, **params).items()
+      )
+    )
+    url = self.BASE_URL + api_version + api.ENDPOINT + params
+    async with aiohttp.ClientSession() as client:
+      async with client.get(url) as resp:
+        result = await api.async_format_results(resp)
+    return result
+
+    async def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
+      return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)

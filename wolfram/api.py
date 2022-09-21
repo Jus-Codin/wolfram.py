@@ -1,34 +1,28 @@
 from wolfram.models import ConversationalResults, FullResults, Model
 
-from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar
+from typing import Any, Optional
 
-if TYPE_CHECKING:
-  from aiohttp import ClientResponse
-  from requests import Response
-
-ResT = TypeVar("ResT")
-
-class API(Generic[ResT]):
+class API:
   VERSION: int
   ENDPOINT: str
 
-  def format_results(self, resp: Response) -> ResT:
+  def format_results(self, resp: Response):
     raise NotImplementedError
 
-  async def async_format_results(self, resp: ClientResponse) -> ResT:
+  async def async_format_results(self, resp: ClientResponse):
     raise NotImplementedError
 
 
 
-class FullResultsAPI(API[FullResults]):
+class FullResultsAPI(API):
   VERSION = 2
   ENDPOINT = "query"
 
-  def format_results(self, resp: Response) -> ResT:
+  def format_results(self, resp: Response) -> FullResults:
     raw = resp.json()
     return FullResults.from_dict(raw)
 
-  async def async_format_results(self, resp: ClientResponse) -> ResT:
+  async def async_format_results(self, resp: ClientResponse) -> FullResults:
     raw = await resp.json()
     return FullResults.from_dict(raw)
 
@@ -70,14 +64,14 @@ class SpokenAPI(API):
 
 
 
-class ConversationalAPI(API[ConversationalResults]):
+class ConversationalAPI(API):
   VERSION = 1
   ENDPOINT = "conversation.jsp"
 
-  def format_results(self, resp: Response) -> ResT:
+  def format_results(self, resp: Response) -> ConversationalResults:
     raw = resp.json()
     return ConversationalResults.from_dict(raw)
 
-  async def async_format_results(self, resp: ClientResponse) -> ResT:
+  async def async_format_results(self, resp: ClientResponse) -> ConversationalResults:
     raw = await resp.json()
     return ConversationalResults.from_dict(raw)
