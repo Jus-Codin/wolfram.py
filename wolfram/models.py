@@ -47,6 +47,8 @@ class WolframURL:
     url, self._query = url.split("?")
     self._path = url.replace("\/", "/")
 
+
+
   @property
   def path(self) -> str:
     return self._path
