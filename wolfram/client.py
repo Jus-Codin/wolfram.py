@@ -58,11 +58,7 @@ class Client(ClientABC):
     )
     url = request.base_url + api_version + endpoint + params
     resp = requests.get(url)
-    try: 
-      data = resp.json()
-    except JSONDecodeError:
-      raise Exception() # TODO: Change to custom exception
-    return data
+    return resp
 
 
 
