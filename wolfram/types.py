@@ -1,5 +1,7 @@
 """
 Typed dictionary of every single model in the API
+
+This might be removed in the future
 """
 
 from __future__ import annotations
@@ -76,6 +78,7 @@ class PodDict(WolframDict):
 class SubPodDict(WolframDict):
   title: Optional[str]
   img: Optional[ImageDict]
+  sound: Optional[AudioDict]
   plaintext: Optional[str]
 
 

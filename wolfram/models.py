@@ -4,24 +4,42 @@ data classes are here
 """
 from __future__ import annotations
 
-from dataclasses import Field, dataclass, field, InitVar
+from dataclasses import dataclass, field, InitVar
 from typing import (
-  Any,
   Callable,
-  ClassVar,
   Generic,
-  Iterable,
-  List,
-  Literal,
   Mapping,
   Optional,
   Sequence,
   TYPE_CHECKING,
-  TypeVar,
-  Union
+  TypeVar
 )
 
-from wolfram.types import *
+from wolfram.types import (
+  WolframDict,
+  FullResultsDict,
+  ConversationalResultsDict,
+  PodDict,
+  SubPodDict,
+  ImageDict,
+  AudioDict,
+  AssumptionsDict,
+  AssumptionDict,
+  WarningDict,
+  SpellCheckWarningDict,
+  DelimiterWarningDict,
+  TranslationWarningDict,
+  AlternativeDict,
+  ReinterpretWarningDict,
+  DidYouMeanDict,
+  LanguageMsgDict,
+  FutureTopicDict,
+  ExamplePageDict,
+  TipsDict,
+  GeneralizationDict,
+  ErrorDict,
+  SourceDict
+)
 from wolfram.utils import optional_factory, list_map_factory, always_list_factory
 
 if TYPE_CHECKING:
@@ -282,6 +300,9 @@ class SubPod(Model[SubPodDict]):
   plaintext: Optional[str]
   img: Optional[Image] = optional_field(
     factory=Image.from_dict
+  )
+  sound: Optional[Image] = optional_field(
+    factory=Audio.from_dict
   )
 
 
