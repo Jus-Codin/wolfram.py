@@ -1,15 +1,21 @@
+from __future__ import annotations
+
 from wolfram.models import ConversationalResults, FullResults, Model
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+  from requests import Response
+  from aiohttp import ClientResponse
 
 class API:
   VERSION: int
   ENDPOINT: str
 
-  def format_results(self, resp: Response):
+  def format_results(resp: Response):
     raise NotImplementedError
 
-  async def async_format_results(self, resp: ClientResponse):
+  async def async_format_results(resp: ClientResponse):
     raise NotImplementedError
 
 
@@ -18,13 +24,13 @@ class FullResultsAPI(API):
   VERSION = 2
   ENDPOINT = "query"
 
-  def format_results(self, resp: Response) -> FullResults:
+  def format_results(resp: Response) -> FullResults:
     raw = resp.json()
-    return FullResults.from_dict(raw)
+    return FullResults.from_dict(raw["queryresult"])
 
-  async def async_format_results(self, resp: ClientResponse) -> FullResults:
+  async def async_format_results(resp: ClientResponse) -> FullResults:
     raw = await resp.json()
-    return FullResults.from_dict(raw)
+    return FullResults.from_dict(raw["queryresult"])
 
 
 
@@ -32,10 +38,10 @@ class SimpleAPI(API):
   VERSION = 1
   ENDPOINT = "simple"
 
-  def format_results(self, resp: Response) -> bytes:
+  def format_results(resp: Response) -> bytes:
     return resp.content
 
-  async def async_format_results(self, resp: ClientResponse) -> bytes:
+  async def async_format_results(resp: ClientResponse) -> bytes:
     return await resp.read()
 
 
@@ -44,10 +50,10 @@ class ShortAPI(API):
   VERSION = 1
   ENDPOINT = "result"
 
-  def format_results(self, resp: Response) -> str:
+  def format_results(resp: Response) -> str:
     return resp.text
 
-  async def async_format_results(self, resp: ClientResponse) -> str:
+  async def async_format_results(resp: ClientResponse) -> str:
     return await resp.text()
 
 
@@ -56,10 +62,10 @@ class SpokenAPI(API):
   VERSION = 1
   ENDPOINT = "spoken"
 
-  def format_results(self, resp: Response) -> str:
+  def format_results(resp: Response) -> str:
     return resp.text
 
-  async def async_format_results(self, resp: ClientResponse) -> str:
+  async def async_format_results(resp: ClientResponse) -> str:
     return await resp.text()
 
 
@@ -68,10 +74,10 @@ class ConversationalAPI(API):
   VERSION = 1
   ENDPOINT = "conversation.jsp"
 
-  def format_results(self, resp: Response) -> ConversationalResults:
+  def format_results(resp: Response) -> ConversationalResults:
     raw = resp.json()
     return ConversationalResults.from_dict(raw)
 
-  async def async_format_results(self, resp: ClientResponse) -> ConversationalResults:
+  async def async_format_results(resp: ClientResponse) -> ConversationalResults:
     raw = await resp.json()
     return ConversationalResults.from_dict(raw)

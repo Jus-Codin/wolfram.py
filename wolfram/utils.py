@@ -1,6 +1,9 @@
-from typing import Any, Callable, Iterable, List, Optional
+from __future__ import annotations
 
-from wolfram.models import DictT
+from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Optional
+
+if TYPE_CHECKING:
+  from wolfram.models import DictT
 
 
 def optional_factory(func: Callable[[DictT], Any], match: Optional[Any]=None):
@@ -9,6 +12,7 @@ def optional_factory(func: Callable[[DictT], Any], match: Optional[Any]=None):
       return val
     else:
       return func(val)
+  return wrap
 
 def list_map_factory(func: Callable[[DictT], Any]):
   def wrap(seq: Iterable[DictT, ...]):

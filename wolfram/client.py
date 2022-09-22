@@ -1,15 +1,15 @@
+from __future__ import annotations
+
 from json import JSONDecodeError
 from urllib.parse import urlencode
 from typing import TYPE_CHECKING, Dict, Optional, Sequence, Tuple
 
-from wolfram.api import FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
-from wolfram.models import FullResults, WolframRequest
+from wolfram.api import API, FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
+from wolfram.models import FullResults
 
 if TYPE_CHECKING:
   from aiohttp import ClientResponse
   from requests import Response
-
-  from wolfram.api import API
 
 import aiohttp
 import requests
@@ -23,7 +23,7 @@ class ClientBase:
     2: "v2/"
   }
 
-  def __init__(self, appid: str, base_url: str = None):
+  def __init__(self, appid: str):
     self._appid = appid
 
   @property
@@ -37,7 +37,7 @@ class Client(ClientBase):
   """Client to interact with the APIs"""
 
   def query(self, api: API, **params):
-    if not isinstance(api, API):
+    if not issubclass(api, API):
       raise TypeError("api must be `API` type")
 
 
@@ -56,7 +56,10 @@ class Client(ClientBase):
     return api.format_results(resp)
 
   def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
-    return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
+    if format is not None:
+      return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
+    else:
+      return self.query(api=FullResultsAPI, input=input, **params)
 
 
 
@@ -85,4 +88,7 @@ class AsyncClient(ClientBase):
     return result
 
     async def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
-      return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
+      if format is not None:
+        return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
+      else:
+        return await self.query(api=FullResultsAPI, input=input, **params)

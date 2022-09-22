@@ -4,7 +4,7 @@ data classes are here
 """
 from __future__ import annotations
 
-from dataclasses import Field, dataclass, field
+from dataclasses import Field, dataclass, field, InitVar
 from typing import (
   Any,
   Callable,
@@ -31,34 +31,27 @@ DictT = TypeVar("DictT", bound=WolframDict)
 
 
 
-@dataclass
-class WolframRequest:
-  """Contains data about the request that is to be sent to the API.
-  This is not meant to be used directly"""
-  base_url: str = "https://api.wolframalpha.com/"
-  version: int
-  endpoint: str
-  params: Mapping[str, str]
-
-
-
 class WolframURL:
   def __init__(self, url: str):
-    url, self._query = url.split("?")
+    url = url.split("?")
+    if len(url) > 1:
+      url, self._query = url
+    else:
+      url, self._query = url[0], None
     self._path = url.replace("\/", "/")
-
-
 
   @property
   def path(self) -> str:
     return self._path
 
   @property
-  def query(self) -> str:
+  def query(self) -> Optional[str]:
     return self._query
 
   @property
-  def params(self) -> Mapping[str, str]:
+  def params(self) -> Optional[Mapping[str, str]]:
+    if self.query is None:
+      return None
     d = {}
     for param in self.query.split("&"):
       k, v = param.split("=")
@@ -67,7 +60,10 @@ class WolframURL:
 
   @property
   def url(self) -> str:
-    return self.path + "?" + self.query
+    if self.query is None:
+      return self.path
+    else:
+      return self.path + "?" + self.query
 
 
 
@@ -77,18 +73,23 @@ def model_field(factory: Optional[Callable] = None, **kwargs) -> Field:
     **kwargs
   )
 
-def optional_field(default=None, **kwargs) -> Field:
-  return model_field(default=None, **kwargs)
+def optional_field(factory: Callable, match=None, **kwargs) -> Field:
+  return field(
+    default=None,
+    metadata={"factory": optional_factory(factory, match=match)},
+    **kwargs
+  )
 
 @dataclass
 class Model(Generic[DictT]):
   """The base class of all Wolfram|Alpha models"""
-  _raw: DictT = None
+  _raw: InitVar[DictT]
 
-  def __post_init__(self):
+  def __post_init__(self, _raw: DictT=None):
+    self._raw = _raw
     for attr, field in self.__dataclass_fields__.items():
       # This is a little hacky, but no better way to do this with dataclasses
-      factory = field.metadata.get("factory") 
+      factory = field.metadata.get("factory")
       if factory is not None:
         val = getattr(self, attr)
         setattr(self, attr, factory(val))
@@ -101,7 +102,7 @@ class Model(Generic[DictT]):
       **{
         k: v
         for k, v in raw.items()
-        if k in self.__dataclass_fields__.keys()
+        if k in cls.__dataclass_fields__.keys()
       }
     )
 
@@ -280,9 +281,7 @@ class SubPod(Model[SubPodDict]):
   title: str
   plaintext: Optional[str]
   img: Optional[Image] = optional_field(
-    factory=optional_factory(
-      Image.from_dict
-    )
+    factory=Image.from_dict
   )
 
 
@@ -293,18 +292,16 @@ class Pod(Model[PodDict]):
   position: int
   id: str
   numsubpods: int
-  primary: Optional[Literal[True]] = None
-  error: Optional[Error] = model_field(
-    factory=optional_factory(
-      Error.from_dict,
-      match=False
-    )
+  error: Optional[Error] = optional_field(
+    factory=Error.from_dict,
+    match=False
   )
-  subpods: Sequence[SubPod, ...] = model_field(
+  subpods: Sequence[SubPod, ...] = optional_field(
     factory=list_map_factory(
       SubPod.from_dict
     )
   )
+  primary: bool = False
 
 
 
@@ -317,50 +314,52 @@ class FullResults(Model[FullResultsDict]):
   id: str
   host: str
 
-  tips: Sequence[Tip, ...] = model_field(
+  tips: Optional[Sequence[Tip, ...]] = optional_field(
     factory=always_list_factory(
       Tip.from_dict
     )
   )
 
-  recalculate: Optional[WolframURL] = model_field(
+  recalculate: Optional[WolframURL] = optional_field(
     factory=optional_factory(
       WolframURL,
       match=""
     )
   )
-  pods: Sequence[Pod, ...] = model_field(
+  pods: Optional[Sequence[Pod, ...]] = optional_field(
     factory=list_map_factory(
       Pod.from_dict
     )
-  )
-  assumptions: Optional[AssumptionsCollection] = None
-  warnings: Optional[Warning] = model_field(
+  )  
+  
+  warnings: Optional[Warning] = optional_field(
     factory=Warning.to_subclass
   )
-  sources: Sequence[Source] = model_field(
+  sources: Optional[Sequence[Source]] = optional_field(
     factory=always_list_factory(
       Source.from_dict
     )
   )
 
-  languagemsg: Optional[LanguageMsg] = model_field(
+  languagemsg: Optional[LanguageMsg] = optional_field(
     factory=LanguageMsg.from_dict
   )
-  futuretopic: Optional[FutureTopic] = model_field(
+  futuretopic: Optional[FutureTopic] = optional_field(
     factory=FutureTopic.from_dict
   )
-  examplepage: Optional[ExamplePage] = model_field(
+  examplepage: Optional[ExamplePage] = optional_field(
     factory=ExamplePage.from_dict
   )
-  generalization: Optional[Generalization] = model_field(
+  generalization: Optional[Generalization] = optional_field(
     factory=Generalization.from_dict
   )
-  didyoumeans: Sequence[DidYouMean] = model_field(
+  didyoumeans: Optional[Sequence[DidYouMean]] = optional_field(
     factory=always_list_factory(
       DidYouMean.from_dict
     )
   )
+  
+  assumptions: Optional[AssumptionsCollection] = None
 
 
 
@@ -369,4 +368,4 @@ class ConversationalResults(Model[ConversationalResultsDict]):
   result: str
   conversationID: str
   host: str
-  s: Optional[int] = optional_field()
+  s: Optional[int] = model_field()
