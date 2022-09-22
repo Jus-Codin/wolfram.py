@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from wolfram.models import ConversationalResults, FullResults, Model
+from wolfram.models import ConversationalResults, FullResults, Model, SimpleImage
 
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -38,11 +38,11 @@ class SimpleAPI(API):
   VERSION = 1
   ENDPOINT = "simple"
 
-  def format_results(resp: Response) -> bytes:
-    return resp.content
+  def format_results(resp: Response) -> SimpleImage:
+    return SimpleImage(resp.content)
 
-  async def async_format_results(resp: ClientResponse) -> bytes:
-    return await resp.read()
+  async def async_format_results(resp: ClientResponse) -> SimpleImage:
+    return SimpleImage(await resp.read())
 
 
 
