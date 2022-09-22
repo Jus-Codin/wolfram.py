@@ -1,6 +1,5 @@
 from wolfram.client import Client, AsyncClient
-
-import api
+from wolfram import api
 
 __all__ = (
   Client,
