@@ -347,7 +347,7 @@ class Pod(Model[PodDict]):
 
 
 
-@dataclass
+@dataclass(repr=False)
 class FullResults(Model[FullResultsDict]):
   success: bool
   numpods: int
@@ -401,7 +401,9 @@ class FullResults(Model[FullResultsDict]):
     )
   )
   
-  assumptions: Optional[AssumptionsCollection] = None
+  assumptions: Optional[AssumptionsCollection] = optional_field(
+    factory=AssumptionsCollection.from_dict
+  )
 
 
 
