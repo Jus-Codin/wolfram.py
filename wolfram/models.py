@@ -148,14 +148,26 @@ class Model(Generic[DictT]):
 
 @dataclass
 class Image(Model[ImageDict]):
-  title: str
   width: int
   height: int
+  contenttype: str
+  src: WolframURL = model_field(
+    factory=WolframURL
+  )
   themes: Sequence[int, ...] = model_field(
     factory=lambda seq: [
       int(ele) for ele in seq.split(",")
     ]
   )
+  title: Optional[str] = optional_field(
+    factory=str,
+    match="?"
+  )
+  alt: Optional[str] = optional_field(
+    factory=str,
+    match="?"
+  )
+
 
 @dataclass
 class Audio(Model[AudioDict]):
@@ -297,7 +309,10 @@ class Source(Model[SourceDict]):
 @dataclass
 class SubPod(Model[SubPodDict]):
   title: str
-  plaintext: Optional[str]
+  plaintext: Optional[str] = optional_field(
+    factory=str,
+    match="?"
+  )
   img: Optional[Image] = optional_field(
     factory=Image.from_dict
   )
