@@ -174,6 +174,9 @@ class Image(Model[ImageDict]):
     match="?"
   )
 
+  def __repr__(self):
+    return f"Image(title={self.title}, alt={self.alt}, src={self.src})"
+
 
 @dataclass
 class Audio(Model[AudioDict]):
@@ -189,6 +192,9 @@ class Assumption(Model[AssumptionDict]):
   name: str
   desc: str
   input: str
+
+  def __repr__(self):
+    return f"Assumption(name={self.name})"
   
 @dataclass
 class AssumptionsCollection(Model[AssumptionsDict]):
@@ -201,6 +207,9 @@ class AssumptionsCollection(Model[AssumptionsDict]):
       Assumption.from_dict
     )
   )
+
+  def __repr__(self):
+    return f"AssumptionsCollection(type={self.type}, word={self.word}, values={self.values})"
 
 
 
@@ -345,9 +354,12 @@ class Pod(Model[PodDict]):
   )
   primary: bool = False
 
+  def __repr__(self):
+    return f"Pod(title={self.title}, numsubpods={self.numsubpods}, primary={self.primary})"
 
 
-@dataclass(repr=False)
+
+@dataclass
 class FullResults(Model[FullResultsDict]):
   success: bool
   numpods: int
@@ -404,6 +416,9 @@ class FullResults(Model[FullResultsDict]):
   assumptions: Optional[AssumptionsCollection] = optional_field(
     factory=AssumptionsCollection.from_dict
   )
+
+  def __repr__(self):
+    return f"FullResults(success={self.success}, numpods={self.numpods})"
 
 
 
