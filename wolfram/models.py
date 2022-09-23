@@ -365,20 +365,25 @@ class Pod(Model[PodDict]):
   position: int
   id: str
   numsubpods: int
-  error: Optional[Error] = optional_field(
-    factory=Error.from_dict,
-    match=False
-  )
-  subpods: Sequence[SubPod, ...] = optional_field(
+  subpods: Sequence[SubPod, ...] = model_field(
     factory=list_map_factory(
       SubPod.from_dict
     )
+  )
+  error: Optional[Error] = optional_field(
+    factory=Error.from_dict,
+    match=False
   )
   primary: bool = False
 
   def __repr__(self):
     return f"Pod(title={self.title}, numsubpods={self.numsubpods}, primary={self.primary})"
 
+  @property
+  def text(self) -> Optional[str]:
+    for subpod in self.subpods:
+      if subpod.plaintext is not None:
+        return subpod.plaintext
 
 
 @dataclass
@@ -456,6 +461,15 @@ class FullResults(Model[FullResultsDict]):
           return pod
     else: # TODO: make custom exception for this
       raise Exception("There are no pods")
+
+  @property
+  def details(self) -> Mapping[str, str]:
+    """A simplified set of answers by pod title"""
+    return {
+      pod.title: pod.text
+      for pod in self.pods
+      if pod.text is not None
+    }
 
 
 
