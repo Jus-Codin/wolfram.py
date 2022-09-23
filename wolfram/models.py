@@ -199,7 +199,6 @@ class Assumption(Model[AssumptionDict]):
 @dataclass
 class AssumptionsCollection(Model[AssumptionsDict]):
   type: str
-  word: str
   template: str
   count: int
   values: Sequence[Assumption, ...] = model_field(
@@ -207,9 +206,23 @@ class AssumptionsCollection(Model[AssumptionsDict]):
       Assumption.from_dict
     )
   )
+  word: Optional[str] = None
 
   def __repr__(self):
     return f"AssumptionsCollection(type={self.type}, word={self.word}, values={self.values})"
+
+  def __iter__(self):
+    return iter(self.values)
+
+  @property
+  def text(self):
+    """The assumption message provided by the API"""
+    text = self.template.replace("${desc1}", self.description)
+    try:
+      text = text.replace("${word}", self.word)
+    except TypeError:
+      pass
+    return text.split(". ", 1)[0]
 
 
 
@@ -234,6 +247,11 @@ class Warning(Model[WarningDict], Generic[DictT]):
     cls = cls._find_cls(warning)
     return cls.from_dict(warning)
 
+  @property
+  def msg(self):
+    """The warning message provided by Wolfram|Alpha"""
+    return self.text
+
 @dataclass
 class SpellCheckWarning(Warning[SpellCheckWarningDict]):
   word: str
@@ -256,7 +274,7 @@ class Alternative(Model[AlternativeDict]):
   score: float = model_field(factory=float)
 
 @dataclass
-class ReinterpretWarning(Model[ReinterpretWarningDict]):
+class ReinterpretWarning(Warning[ReinterpretWarningDict]):
   new: str
   level: str
   score: float = model_field(factory=float)
@@ -265,6 +283,10 @@ class ReinterpretWarning(Model[ReinterpretWarningDict]):
       Alternative.from_dict
     )
   )
+
+  @property
+  def msg(self):
+    return f"{self.text} {self.new}"
 
 
 
@@ -417,8 +439,23 @@ class FullResults(Model[FullResultsDict]):
     factory=AssumptionsCollection.from_dict
   )
 
+  error: Optional[Error] = optional_field(
+    factory=Error.from_dict,
+    match=False
+  )
+
   def __repr__(self):
     return f"FullResults(success={self.success}, numpods={self.numpods})"
+
+  @property
+  def primary(self) -> Optional[Pod]:
+    """Returns the primary pod, if any"""
+    if self.pods is not None:
+      for pod in self.pods:
+        if pod.primary:
+          return pod
+    else: # TODO: make custom exception for this
+      raise Exception("There are no pods")
 
 
 
