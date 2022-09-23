@@ -112,6 +112,12 @@ class Model(Generic[DictT]):
         val = getattr(self, attr)
         setattr(self, attr, factory(val))
 
+  def __getattr__(self, attr):
+    return self.raw[attr]
+
+  def __getitem__(self, item):
+    return self.raw[item]
+
   @classmethod
   def from_dict(cls, raw: DictT):
     """Constructs the model from a mapping"""
