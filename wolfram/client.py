@@ -10,10 +10,16 @@ if TYPE_CHECKING:
   from aiohttp import ClientResponse
   from requests import Response
 
-  from wolfram.models import FullResults, ConversationalResults
+  from wolfram.models import FullResults, ConversationalResults, SimpleImage
 
 import aiohttp
 import requests
+
+def _remove_null(d: Dict):
+  for k, v in d.items():
+    if v is None:
+      del d[k]
+  return d
 
 class ClientBase:
   """The base class of Clients"""
@@ -70,6 +76,7 @@ class Client(ClientBase):
     ...
 
   def query_full_results(self, input: str, **params) -> FullResults:
+    params = _remove_null(params)
     format = params.pop("format")
     if format is not None:
       return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
@@ -83,6 +90,7 @@ class Client(ClientBase):
     *,
     conversationalID: Optional[str] = None,
     s: Optional[int] = None,
+    geolocation: Optional[str] = None,
     ip: Optional[str] = None,
     units: Optional[Literal["metric", "imperial"]] = None,
     **params
@@ -90,7 +98,28 @@ class Client(ClientBase):
     ...
 
   def query_conversational(self, i: str, **params) -> ConversationalResults:
+    params = _remove_null(params)
     return self.query(api=ConversationalAPI, i=i, **params)
+
+  @overload
+  def query_simple(
+    self,
+    i: str,
+    *,
+    layout: Optional[str] = None,
+    background: Optional[str] = None,
+    foreground: Optional[str] = None,
+    fontsize: Optional[int] = None,
+    width: Optional[int] = None,
+    units: Optional[Literal["metric", "imperial"]] = None,
+    timeout: Optional[int] = None,
+    **params
+  ) -> SimpleImage:
+    ...
+
+  def query_simple(self, i: str, **params) -> SimpleImage:
+    params = _remove_null(params)
+    return self.query(api=SimpleAPI, i=i, **params)
 
 
 
@@ -132,15 +161,13 @@ class AsyncClient(ClientBase):
     ...
 
   async def query_full_results(self, input: str, **params) -> FullResults:
+    params = _remove_null(params)
     format = params.pop("format")
     if format is not None:
       return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
     else:
       return await self.query(api=FullResultsAPI, input=input, **params)
 
-  # TODO: Implement geolocation param
-  # WolframAlpha allows parameter to contain commas,
-  # but urllib.encode converts it to percent encoding
   @overload
   async def query_conversational(
     self,
@@ -148,6 +175,7 @@ class AsyncClient(ClientBase):
     *,
     conversationalID: Optional[str] = None,
     s: Optional[int] = None,
+    geolocation: Optional[str] = None,
     ip: Optional[str] = None,
     units: Optional[
       Union[Literal["metric"], Literal["imperial"]]
@@ -157,4 +185,25 @@ class AsyncClient(ClientBase):
     ...
 
   async def query_conversational(self, i: str, **params) -> ConversationalResults:
+    params = _remove_null(params)
     return await self.query(api=ConversationalAPI, i=i, **params)
+
+  @overload
+  async def query_simple(
+    self,
+    i: str,
+    *,
+    layout: Optional[str] = None,
+    background: Optional[str] = None,
+    foreground: Optional[str] = None,
+    fontsize: Optional[int] = None,
+    width: Optional[int] = None,
+    units: Optional[Literal["metric", "imperial"]] = None,
+    timeout: Optional[int] = None,
+    **params
+  ) -> SimpleImage:
+    ...
+
+  async def query_simple(self, i: str, **params) -> SimpleImage:
+    params = _remove_null(params)
+    return await self.query(api=SimpleAPI, i=i, **params)
