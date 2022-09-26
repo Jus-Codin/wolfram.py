@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from json import JSONDecodeError
 from urllib.parse import urlencode
-from typing import TYPE_CHECKING, Dict, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union
 
 from wolfram.api import API, FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
 
@@ -58,13 +58,41 @@ class Client(ClientBase):
     resp = requests.get(url)
     return api.format_results(resp)
 
-  def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
+  def query_full_results(
+    self,
+    input: str,
+    format: Optional[Sequence[str, ...]] = None,
+    **params
+  ) -> FullResults:
     if format is not None:
       return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
     else:
       return self.query(api=FullResultsAPI, input=input, **params)
 
-
+  # TODO: Implement geolocation param
+  # WolframAlpha allows parameter to contain commas,
+  # but urllib.encode converts it to percent encoding
+  def query_conversational(
+    self,
+    i: str,
+    conversationalID: Optional[str] = None,
+    s: Optional[int] = None,
+    ip: Optional[str] = None,
+    units: Optional[
+      Union[Literal["metric"], Literal["imperial"]]
+    ] = None,
+    **params
+  ) -> ConversationalResults:
+    # This is... inefficient
+    if conversationalID is not None:
+      params["conversationalID"] = conversationalID
+    if s is not None:
+      params["s"] = s
+    if ip is not None:
+      params["ip"] = ip
+    if units is not None:
+      params["units"] = units
+    return self.query(api=ConversationalAPI, i=i, **params)
 
 class AsyncClient(ClientBase):
   """Async client to interact with the APIs, powered by aiohttp"""
@@ -92,8 +120,33 @@ class AsyncClient(ClientBase):
         result = await api.async_format_results(resp)
     return result
 
-    async def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
-      if format is not None:
-        return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
-      else:
-        return await self.query(api=FullResultsAPI, input=input, **params)
+  async def query_full_results(self, input: str, format: Optional[Sequence[str, ...]] = None, **params) -> FullResults:
+    if format is not None:
+      return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
+    else:
+      return await self.query(api=FullResultsAPI, input=input, **params)
+
+  # TODO: Implement geolocation param
+  # WolframAlpha allows parameter to contain commas,
+  # but urllib.encode converts it to percent encoding
+  async def query_conversational(
+    self,
+    i: str,
+    conversationalID: Optional[str] = None,
+    s: Optional[int] = None,
+    ip: Optional[str] = None,
+    units: Optional[
+      Union[Literal["metric"], Literal["imperial"]]
+    ] = None,
+    **params
+  ) -> ConversationalResults:
+    # This is... inefficient
+    if conversationalID is not None:
+      params["conversationalID"] = conversationalID
+    if s is not None:
+      params["s"] = s
+    if ip is not None:
+      params["ip"] = ip
+    if units is not None:
+      params["units"] = units
+    return await self.query(api=ConversationalAPI, i=i, **params)
