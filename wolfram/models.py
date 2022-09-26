@@ -494,10 +494,11 @@ class FullResults(Model[FullResultsDict]):
 
 @dataclass
 class ConversationalResults(Model[ConversationalResultsDict]):
-  result: str
   conversationID: str
   host: str
   s: Optional[int] = optional_field(factory=int)
+  result: Optional[str] = optional_field(factory=str)
+  error: Optional[str] = optional_field(factory=str)
 
   @property
   def followup_url(self) -> str:
