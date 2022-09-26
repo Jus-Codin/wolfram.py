@@ -497,7 +497,7 @@ class ConversationalResults(Model[ConversationalResultsDict]):
   result: str
   conversationID: str
   host: str
-  s: Optional[int] = model_field()
+  s: Optional[int] = optional_field(factory=int)
 
   @property
   def followup_url(self) -> str:
