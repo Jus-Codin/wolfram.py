@@ -471,6 +471,21 @@ class FullResults(Model[FullResultsDict]):
       if pod.text is not None
     }
 
+  @property
+  def is_fallthrough(self) -> bool:
+    """If the result is a fallthrough result.
+    A fallthrough result occurs when the API does not understand your query.
+    For more information, read https://products.wolframalpha.com/api/documentation/#queries-that-are-not-understood
+    """
+    return not self.success and self.error is None
+
+  @property
+  def fallthrough(self):
+    """Returns a fallthrough result, if any"""
+    return (
+      self.languagemsg or self.futuretopic or self.examplepage or self.generalization or self.didyoumeans
+    )
+
 
 
 @dataclass
@@ -479,6 +494,20 @@ class ConversationalResults(Model[ConversationalResultsDict]):
   conversationID: str
   host: str
   s: Optional[int] = model_field()
+
+  @property
+  def followup_url(self) -> str:
+    """The url to send a follow up request to.
+    Note that this is meant to be passed to `Client.query_conversational`"""
+    return f"https://{self.host}/api/"
+
+  @property
+  def followup_params(self) -> dict:
+    """A dictionary of parameters that should be sent with the follow up request"""
+    d = dict(conversationID=self.conversationID)
+    if self.s is not None:
+      d["s"] = self.s
+    return d
 
 
 
