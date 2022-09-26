@@ -15,18 +15,6 @@ if TYPE_CHECKING:
 import aiohttp
 import requests
 
-def _remove_null(d: Dict):
-  for k, v in d.items():
-    if v is None:
-      del d[k]
-  return d
-
-def api_method(func):
-  def wrap(self, *args, **params):
-    params = _remove_null(params)
-    return func(self, *args, **params)
-  return wrap
-
 class ClientBase:
   """The base class of Clients"""
   BASE_URL = "https://api.wolframalpha.com/"
@@ -49,7 +37,7 @@ class ClientBase:
 class Client(ClientBase):
   """Client to interact with the APIs"""
 
-  def query(self, api: API, **params):
+  def query(self, api: API, base_url: Optional[str] = None, **params):
     if not issubclass(api, API):
       raise TypeError("api must be `API` type")
 
@@ -66,7 +54,9 @@ class Client(ClientBase):
         dict(appid=self.appid, **api.PARAMS, **params).items()
       )
     )
-    url = self.BASE_URL + api_version + api.ENDPOINT + params
+    if base_url is None:
+      base_url = self.BASE_URL
+    url = base_url + api_version + api.ENDPOINT + params
     resp = requests.get(url)
     return api.format_results(resp)
 
@@ -80,7 +70,6 @@ class Client(ClientBase):
   ) -> FullResults:
     ...
 
-  @api_method
   def query_full_results(self, input: str, **params) -> FullResults:
     format = params.pop("format", None)
     if format is not None:
@@ -93,7 +82,19 @@ class Client(ClientBase):
     self,
     i: str,
     *,
-    conversationalID: Optional[str] = None,
+    geolocation: Optional[str] = None,
+    ip: Optional[str] = None,
+    units: Optional[Literal["metric", "imperial"]] = None
+  ) -> ConversationalResults:
+    ...
+
+  @overload
+  def query_conversational(
+    self,
+    i: str,
+    *,
+    conversationalID: str,
+    host: str,
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
@@ -101,7 +102,6 @@ class Client(ClientBase):
   ) -> ConversationalResults:
     ...
 
-  @api_method
   def query_conversational(self, i: str, **params) -> ConversationalResults:
     return self.query(api=ConversationalAPI, i=i, **params)
 
@@ -120,7 +120,6 @@ class Client(ClientBase):
   ) -> SimpleImage:
     ...
 
-  @api_method
   def query_simple(self, i: str, **params) -> SimpleImage:
     return self.query(api=SimpleAPI, i=i, **params)
 
@@ -134,7 +133,6 @@ class Client(ClientBase):
   ) -> str:
     ...
 
-  @api_method
   def query_short(self, i: str, **params) -> str:
     return self.query(api=ShortAPI, i=i, **params)
 
@@ -148,7 +146,6 @@ class Client(ClientBase):
   ) -> str:
     ...
   
-  @api_method
   def query_spoken(self, i: str, **params) -> str:
     return self.query(api=SpokenAPI, i=i, **params)
 
@@ -157,7 +154,7 @@ class Client(ClientBase):
 class AsyncClient(ClientBase):
   """Async client to interact with the APIs, powered by aiohttp"""
 
-  async def query(self, api: API, **params):
+  async def query(self, api: API, base_url: Optional[str] = None, **params):
     if not isinstance(api, API):
       raise TypeError("api must be `API` type")
 
@@ -174,7 +171,9 @@ class AsyncClient(ClientBase):
         dict(appid=self.appid, **api.PARAMS, **params).items()
       )
     )
-    url = self.BASE_URL + api_version + api.ENDPOINT + params
+    if base_url is None:
+      base_url = self.BASE_URL
+    url = base_url + api_version + api.ENDPOINT + params
     async with aiohttp.ClientSession() as client:
       async with client.get(url) as resp:
         result = await api.async_format_results(resp)
@@ -190,7 +189,6 @@ class AsyncClient(ClientBase):
   ) -> FullResults:
     ...
 
-  @api_method
   async def query_full_results(self, input: str, **params) -> FullResults:
     format = params.pop("format", None)
     if format is not None:
@@ -203,15 +201,26 @@ class AsyncClient(ClientBase):
     self,
     i: str,
     *,
-    conversationalID: Optional[str] = None,
-    s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric"], Literal["imperial"]] = None
+    units: Optional[Literal["metric", "imperial"]] = None
   ) -> ConversationalResults:
     ...
 
-  @api_method
+  @overload
+  async def query_conversational(
+    self,
+    i: str,
+    *,
+    conversationalID: str,
+    host: str,
+    s: Optional[int] = None,
+    geolocation: Optional[str] = None,
+    ip: Optional[str] = None,
+    units: Optional[Literal["metric", "imperial"]] = None
+  ) -> ConversationalResults:
+    ...
+
   async def query_conversational(self, i: str, **params) -> ConversationalResults:
     return await self.query(api=ConversationalAPI, i=i, **params)
 
@@ -230,7 +239,6 @@ class AsyncClient(ClientBase):
   ) -> SimpleImage:
     ...
 
-  @api_method
   async def query_simple(self, i: str, **params) -> SimpleImage:
     return await self.query(api=SimpleAPI, i=i, **params)
 
@@ -244,7 +252,6 @@ class AsyncClient(ClientBase):
   ) -> str:
     ...
 
-  @api_method
   async def query_short(self, i: str, **params) -> str:
     return await self.query(api=ShortAPI, i=i, **params)
 
@@ -258,6 +265,5 @@ class AsyncClient(ClientBase):
   ) -> str:
     ...
   
-  @api_method
   async def query_spoken(self, i: str, **params) -> str:
     return await self.query(api=SpokenAPI, i=i, **params)
