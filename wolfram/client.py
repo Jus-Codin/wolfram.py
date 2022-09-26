@@ -5,11 +5,12 @@ from urllib.parse import urlencode
 from typing import TYPE_CHECKING, Dict, Optional, Sequence, Tuple
 
 from wolfram.api import API, FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
-from wolfram.models import FullResults
 
 if TYPE_CHECKING:
   from aiohttp import ClientResponse
   from requests import Response
+
+  from wolfram.models import FullResults
 
 import aiohttp
 import requests
