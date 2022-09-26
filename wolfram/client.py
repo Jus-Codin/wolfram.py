@@ -21,6 +21,12 @@ def _remove_null(d: Dict):
       del d[k]
   return d
 
+def api_method(func):
+  def wrap(self, *args, **params):
+    params = _remove_null(params)
+    return func(self, *args, **params)
+  return wrap
+
 class ClientBase:
   """The base class of Clients"""
   BASE_URL = "https://api.wolframalpha.com/"
@@ -70,13 +76,12 @@ class Client(ClientBase):
     self,
     input: str,
     *,
-    format: Optional[Sequence[str, ...]] = None,
-    **params
+    format: Optional[Sequence[str, ...]] = None
   ) -> FullResults:
     ...
 
+  @api_method
   def query_full_results(self, input: str, **params) -> FullResults:
-    params = _remove_null(params)
     format = params.pop("format")
     if format is not None:
       return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
@@ -92,13 +97,12 @@ class Client(ClientBase):
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None,
-    **params
+    units: Optional[Literal["metric", "imperial"]] = None
   ) -> ConversationalResults:
     ...
 
+  @api_method
   def query_conversational(self, i: str, **params) -> ConversationalResults:
-    params = _remove_null(params)
     return self.query(api=ConversationalAPI, i=i, **params)
 
   @overload
@@ -112,14 +116,41 @@ class Client(ClientBase):
     fontsize: Optional[int] = None,
     width: Optional[int] = None,
     units: Optional[Literal["metric", "imperial"]] = None,
-    timeout: Optional[int] = None,
-    **params
+    timeout: Optional[int] = None
   ) -> SimpleImage:
     ...
 
+  @api_method
   def query_simple(self, i: str, **params) -> SimpleImage:
-    params = _remove_null(params)
     return self.query(api=SimpleAPI, i=i, **params)
+
+  @overload
+  def query_short(
+    self,
+    i: str,
+    *,
+    units: Optional[Literal["metric", "imperial"]] = None,
+    timeout: Optional[int] = None
+  ) -> str:
+    ...
+
+  @api_method
+  def query_short(self, i: str, **params) -> str:
+    return self.query(api=ShortAPI, i=i, **params)
+
+  @overload
+  def query_spoken(
+    self,
+    i: str,
+    *,
+    units: Optional[Literal["metric", "imperial"]] = None,
+    timeout: Optional[int] = None
+  ) -> str:
+    ...
+  
+  @api_method
+  def query_spoken(self, i: str, **params) -> str:
+    return self.query(api=SpokenAPI, i=i, **params)
 
 
 
@@ -155,11 +186,11 @@ class AsyncClient(ClientBase):
     self,
     input: str,
     *,
-    format: Optional[Sequence[str, ...]] = None,
-    **params
+    format: Optional[Sequence[str, ...]] = None
   ) -> FullResults:
     ...
 
+  @api_method
   async def query_full_results(self, input: str, **params) -> FullResults:
     params = _remove_null(params)
     format = params.pop("format")
@@ -177,13 +208,11 @@ class AsyncClient(ClientBase):
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[
-      Union[Literal["metric"], Literal["imperial"]]
-    ] = None,
-    **params
+    units: Optional[Literal["metric"], Literal["imperial"]] = None
   ) -> ConversationalResults:
     ...
 
+  @api_method
   async def query_conversational(self, i: str, **params) -> ConversationalResults:
     params = _remove_null(params)
     return await self.query(api=ConversationalAPI, i=i, **params)
@@ -199,11 +228,38 @@ class AsyncClient(ClientBase):
     fontsize: Optional[int] = None,
     width: Optional[int] = None,
     units: Optional[Literal["metric", "imperial"]] = None,
-    timeout: Optional[int] = None,
-    **params
+    timeout: Optional[int] = None
   ) -> SimpleImage:
     ...
 
+  @api_method
   async def query_simple(self, i: str, **params) -> SimpleImage:
-    params = _remove_null(params)
     return await self.query(api=SimpleAPI, i=i, **params)
+
+  @overload
+  async def query_short(
+    self,
+    i: str,
+    *,
+    units: Optional[Literal["metric", "imperial"]] = None,
+    timeout: Optional[int] = None
+  ) -> str:
+    ...
+
+  @api_method
+  async def query_short(self, i: str, **params) -> str:
+    return await self.query(api=ShortAPI, i=i, **params)
+
+  @overload
+  async def query_spoken(
+    self,
+    i: str,
+    *,
+    units: Optional[Literal["metric", "imperial"]] = None,
+    timeout: Optional[int] = None
+  ) -> str:
+    ...
+  
+  @api_method
+  async def query_spoken(self, i: str, **params) -> str:
+    return await self.query(api=SpokenAPI, i=i, **params)
