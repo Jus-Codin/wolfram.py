@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from wolfram.models import ConversationalResults, FullResults, Model, SimpleImage
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 if TYPE_CHECKING:
   from requests import Response
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 class API:
   VERSION: int
   ENDPOINT: str
+  PARAMS: Dict[str, str] = {}
 
   def format_results(resp: Response):
     raise NotImplementedError
@@ -23,6 +24,9 @@ class API:
 class FullResultsAPI(API):
   VERSION = 2
   ENDPOINT = "query"
+  PARAMS = {
+    "output": "json"
+  }
 
   def format_results(resp: Response) -> FullResults:
     raw = resp.json()

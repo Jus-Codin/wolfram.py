@@ -48,7 +48,9 @@ class Client(ClientBase):
 
     params = "?" + urlencode(
       tuple(
-        dict(appid=self.appid, **params).items()
+        # Potential exception could be caused here if user passes a parameter specified by the API
+        # TODO: Implement try except statement here
+        dict(appid=self.appid, **api.PARAMS, **params).items()
       )
     )
     url = self.BASE_URL + api_version + api.ENDPOINT + params
@@ -78,7 +80,9 @@ class AsyncClient(ClientBase):
 
     params = "?" + urlencode(
       tuple(
-        dict(appid=self.appid, **params).items()
+        # Potential exception could be caused here if user passes a parameter specified by the API
+        # TODO: Implement try except statement here
+        dict(appid=self.appid, **api.PARAMS, **params).items()
       )
     )
     url = self.BASE_URL + api_version + api.ENDPOINT + params
