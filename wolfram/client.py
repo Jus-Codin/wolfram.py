@@ -37,7 +37,7 @@ class ClientBase:
 class Client(ClientBase):
   """Client to interact with the APIs"""
 
-  def query(self, api: API, base_url: Optional[str] = None, **params):
+  def query(self, api: API, url: Optional[str] = None, **params):
     if not issubclass(api, API):
       raise TypeError("api must be `API` type")
 
@@ -54,15 +54,14 @@ class Client(ClientBase):
         dict(appid=self.appid, **api.PARAMS, **params).items()
       )
     )
-    if base_url is None:
-      base_url = self.BASE_URL
+    base_url = url if url is not None else self.BASE_URL
     url = base_url + api_version + api.ENDPOINT + params
     resp = requests.get(url)
     return api.format_results(resp)
 
   # TODO: Implement all FullResults API params
   @overload
-  def query_full_results(
+  def full_results_query(
     self,
     input: str,
     *,
@@ -70,7 +69,7 @@ class Client(ClientBase):
   ) -> FullResults:
     ...
 
-  def query_full_results(self, input: str, **params) -> FullResults:
+  def full_results_query(self, input: str, **params) -> FullResults:
     format = params.pop("format", None)
     if format is not None:
       return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
@@ -78,7 +77,7 @@ class Client(ClientBase):
       return self.query(api=FullResultsAPI, input=input, **params)
 
   @overload
-  def query_conversational(
+  def conversational_query(
     self,
     i: str,
     *,
@@ -89,12 +88,12 @@ class Client(ClientBase):
     ...
 
   @overload
-  def query_conversational(
+  def conversational_query(
     self,
     i: str,
     *,
     conversationalID: str,
-    host: str,
+    url: str,
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
@@ -102,11 +101,26 @@ class Client(ClientBase):
   ) -> ConversationalResults:
     ...
 
-  def query_conversational(self, i: str, **params) -> ConversationalResults:
+  def conversational_query(self, i: str, **params) -> ConversationalResults:
     return self.query(api=ConversationalAPI, i=i, **params)
 
   @overload
-  def query_simple(
+  def conversational_followup_query(
+    self,
+    i: str,
+    result: ConversationalResults,
+    *,
+    geolocation: Optional[str] = None,
+    ip: Optional[str] = None,
+    units: Optional[Literal["metric", "imperial"]] = None
+  ) -> ConversationalResults:
+    ...
+
+  def conversational_followup_query(self, i: str, result: ConversationalResults, **params):
+    return self.conversational_query(i=i, url=result.followup_url, **result.followup_params, **params)
+
+  @overload
+  def simple_query(
     self,
     i: str,
     *,
@@ -120,11 +134,11 @@ class Client(ClientBase):
   ) -> SimpleImage:
     ...
 
-  def query_simple(self, i: str, **params) -> SimpleImage:
+  def simple_query(self, i: str, **params) -> SimpleImage:
     return self.query(api=SimpleAPI, i=i, **params)
 
   @overload
-  def query_short(
+  def short_query(
     self,
     i: str,
     *,
@@ -133,11 +147,11 @@ class Client(ClientBase):
   ) -> str:
     ...
 
-  def query_short(self, i: str, **params) -> str:
+  def short_query(self, i: str, **params) -> str:
     return self.query(api=ShortAPI, i=i, **params)
 
   @overload
-  def query_spoken(
+  def spoken_query(
     self,
     i: str,
     *,
@@ -146,7 +160,7 @@ class Client(ClientBase):
   ) -> str:
     ...
   
-  def query_spoken(self, i: str, **params) -> str:
+  def spoken_query(self, i: str, **params) -> str:
     return self.query(api=SpokenAPI, i=i, **params)
 
 
@@ -154,7 +168,7 @@ class Client(ClientBase):
 class AsyncClient(ClientBase):
   """Async client to interact with the APIs, powered by aiohttp"""
 
-  async def query(self, api: API, base_url: Optional[str] = None, **params):
+  async def query(self, api: API, url: Optional[str] = None, **params):
     if not isinstance(api, API):
       raise TypeError("api must be `API` type")
 
@@ -171,8 +185,7 @@ class AsyncClient(ClientBase):
         dict(appid=self.appid, **api.PARAMS, **params).items()
       )
     )
-    if base_url is None:
-      base_url = self.BASE_URL
+    base_url = url if url is not None else self.BASE_URL
     url = base_url + api_version + api.ENDPOINT + params
     async with aiohttp.ClientSession() as client:
       async with client.get(url) as resp:
@@ -181,7 +194,7 @@ class AsyncClient(ClientBase):
 
   # TODO: Implement all FullResults API params
   @overload
-  async def query_full_results(
+  async def full_results_query(
     self,
     input: str,
     *,
@@ -189,7 +202,7 @@ class AsyncClient(ClientBase):
   ) -> FullResults:
     ...
 
-  async def query_full_results(self, input: str, **params) -> FullResults:
+  async def full_results_query(self, input: str, **params) -> FullResults:
     format = params.pop("format", None)
     if format is not None:
       return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
@@ -197,7 +210,7 @@ class AsyncClient(ClientBase):
       return await self.query(api=FullResultsAPI, input=input, **params)
 
   @overload
-  async def query_conversational(
+  async def conversational_query(
     self,
     i: str,
     *,
@@ -208,12 +221,12 @@ class AsyncClient(ClientBase):
     ...
 
   @overload
-  async def query_conversational(
+  async def conversational_query(
     self,
     i: str,
     *,
     conversationalID: str,
-    host: str,
+    url: str,
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
@@ -221,11 +234,26 @@ class AsyncClient(ClientBase):
   ) -> ConversationalResults:
     ...
 
-  async def query_conversational(self, i: str, **params) -> ConversationalResults:
+  async def conversational_query(self, i: str, **params) -> ConversationalResults:
     return await self.query(api=ConversationalAPI, i=i, **params)
+  
+  @overload
+  async def conversational_followup_query(
+    self,
+    i: str,
+    result: ConversationalResults,
+    *,
+    geolocation: Optional[str] = None,
+    ip: Optional[str] = None,
+    units: Optional[Literal["metric", "imperial"]] = None
+  ) -> ConversationalResults:
+    ...
+
+  async def conversational_followup_query(self, i: str, result: ConversationalResults, **params):
+    return await self.conversational_query(i=i, url=result.followup_url, **result.followup_params, **params)
 
   @overload
-  async def query_simple(
+  async def simple_query(
     self,
     i: str,
     *,
@@ -239,11 +267,11 @@ class AsyncClient(ClientBase):
   ) -> SimpleImage:
     ...
 
-  async def query_simple(self, i: str, **params) -> SimpleImage:
+  async def simple_query(self, i: str, **params) -> SimpleImage:
     return await self.query(api=SimpleAPI, i=i, **params)
 
   @overload
-  async def query_short(
+  async def short_query(
     self,
     i: str,
     *,
@@ -252,11 +280,11 @@ class AsyncClient(ClientBase):
   ) -> str:
     ...
 
-  async def query_short(self, i: str, **params) -> str:
+  async def short_query(self, i: str, **params) -> str:
     return await self.query(api=ShortAPI, i=i, **params)
 
   @overload
-  async def query_spoken(
+  async def spoken_query(
     self,
     i: str,
     *,
@@ -265,5 +293,5 @@ class AsyncClient(ClientBase):
   ) -> str:
     ...
   
-  async def query_spoken(self, i: str, **params) -> str:
+  async def spoken_query(self, i: str, **params) -> str:
     return await self.query(api=SpokenAPI, i=i, **params)
