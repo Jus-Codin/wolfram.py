@@ -78,9 +78,7 @@ class Client(ClientBase):
     conversationalID: Optional[str] = None,
     s: Optional[int] = None,
     ip: Optional[str] = None,
-    units: Optional[
-      Union[Literal["metric"], Literal["imperial"]]
-    ] = None,
+    units: Optional[Literal["metric", "imperial"]] = None,
     **params
   ) -> ConversationalResults:
     # This is... inefficient
