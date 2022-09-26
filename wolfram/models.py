@@ -453,6 +453,10 @@ class FullResults(Model[FullResultsDict]):
     return f"FullResults(success={self.success}, numpods={self.numpods})"
 
   @property
+  def is_error(self) -> bool:
+    return self.error is not None
+
+  @property
   def primary(self) -> Optional[Pod]:
     """Returns the primary pod, if any"""
     if self.pods is not None:
