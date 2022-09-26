@@ -82,7 +82,7 @@ class Client(ClientBase):
 
   @api_method
   def query_full_results(self, input: str, **params) -> FullResults:
-    format = params.pop("format")
+    format = params.pop("format", None)
     if format is not None:
       return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
     else:
