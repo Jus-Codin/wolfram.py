@@ -192,8 +192,7 @@ class AsyncClient(ClientBase):
 
   @api_method
   async def query_full_results(self, input: str, **params) -> FullResults:
-    params = _remove_null(params)
-    format = params.pop("format")
+    format = params.pop("format", None)
     if format is not None:
       return await self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
     else:
@@ -214,7 +213,6 @@ class AsyncClient(ClientBase):
 
   @api_method
   async def query_conversational(self, i: str, **params) -> ConversationalResults:
-    params = _remove_null(params)
     return await self.query(api=ConversationalAPI, i=i, **params)
 
   @overload
