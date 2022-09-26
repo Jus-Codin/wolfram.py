@@ -14,7 +14,9 @@ print(res.primary.subpods[0].plaintext)
 >>> '3.1415926535897932384626433832795028841971693993751058209749445923...'
 ```
 
-This is still a work in progress, and the name might be changed
+If you do not have an API key, you can get one from https://products.wolframalpha.com/api/
+
+Note that this is still a work in progress
 
 APIs that are to be implemented:
 
