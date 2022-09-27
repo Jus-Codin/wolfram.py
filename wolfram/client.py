@@ -143,7 +143,7 @@ class Client(ClientBase):
     *,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None
+    units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
@@ -157,7 +157,7 @@ class Client(ClientBase):
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None
+    units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
@@ -172,7 +172,7 @@ class Client(ClientBase):
     *,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None
+    units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
@@ -189,7 +189,7 @@ class Client(ClientBase):
     foreground: Optional[str] = None,
     fontsize: Optional[int] = None,
     width: Optional[int] = None,
-    units: Optional[Literal["metric", "imperial"]] = None,
+    units: Optional[Units] = None,
     timeout: Optional[int] = None
   ) -> SimpleImage:
     ...
@@ -202,7 +202,7 @@ class Client(ClientBase):
     self,
     i: str,
     *,
-    units: Optional[Literal["metric", "imperial"]] = None,
+    units: Optional[Units] = None,
     timeout: Optional[int] = None
   ) -> str:
     ...
@@ -215,7 +215,7 @@ class Client(ClientBase):
     self,
     i: str,
     *,
-    units: Optional[Literal["metric", "imperial"]] = None,
+    units: Optional[Units] = None,
     timeout: Optional[int] = None
   ) -> str:
     ...
@@ -335,7 +335,7 @@ class AsyncClient(ClientBase):
     *,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None
+    units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
@@ -349,7 +349,7 @@ class AsyncClient(ClientBase):
     s: Optional[int] = None,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None
+    units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
@@ -364,7 +364,7 @@ class AsyncClient(ClientBase):
     *,
     geolocation: Optional[str] = None,
     ip: Optional[str] = None,
-    units: Optional[Literal["metric", "imperial"]] = None
+    units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
@@ -381,7 +381,7 @@ class AsyncClient(ClientBase):
     foreground: Optional[str] = None,
     fontsize: Optional[int] = None,
     width: Optional[int] = None,
-    units: Optional[Literal["metric", "imperial"]] = None,
+    units: Optional[Units] = None,
     timeout: Optional[int] = None
   ) -> SimpleImage:
     ...
@@ -394,7 +394,7 @@ class AsyncClient(ClientBase):
     self,
     i: str,
     *,
-    units: Optional[Literal["metric", "imperial"]] = None,
+    units: Optional[Units] = None,
     timeout: Optional[int] = None
   ) -> str:
     ...
@@ -407,7 +407,7 @@ class AsyncClient(ClientBase):
     self,
     i: str,
     *,
-    units: Optional[Literal["metric", "imperial"]] = None,
+    units: Optional[Units] = None,
     timeout: Optional[int] = None
   ) -> str:
     ...
