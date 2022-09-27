@@ -59,13 +59,72 @@ class Client(ClientBase):
     resp = requests.get(url)
     return api.format_results(resp)
 
-  # TODO: Implement all FullResults API params
+  # NOTE: Not all parameters are supported
+  # Additionally, parameters produced by timeout and async related params are not easily accessible atm
   @overload
   def full_results_query(
     self,
     input: str,
     *,
-    format: Optional[Sequence[str, ...]] = None
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
+  ) -> FullResults:
+    ...
+  
+  @overload
+  def full_results_query(
+    self,
+    input: str,
+    *,
+    ip: str,
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
+  ) -> FullResults:
+    ...
+
+  @overload
+  def full_results_query(
+    self,
+    input: str,
+    *,
+    latlong: str, # TODO: Make latlong class
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
+  ) -> FullResults:
+    ...
+
+  @overload
+  def full_results_query(
+    self,
+    input: str,
+    *,
+    location: str,
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
   ) -> FullResults:
     ...
 
@@ -192,13 +251,72 @@ class AsyncClient(ClientBase):
         result = await api.async_format_results(resp)
     return result
 
-  # TODO: Implement all FullResults API params
+  # NOTE: Not all parameters are supported
+  # Additionally, parameters produced by timeout and async related params are not easily accessible atm
   @overload
   async def full_results_query(
     self,
     input: str,
     *,
-    format: Optional[Sequence[str, ...]] = None
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
+  ) -> FullResults:
+    ...
+  
+  @overload
+  async def full_results_query(
+    self,
+    input: str,
+    *,
+    ip: str,
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
+  ) -> FullResults:
+    ...
+
+  @overload
+  async def full_results_query(
+    self,
+    input: str,
+    *,
+    latlong: str, # TODO: Make latlong class
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
+  ) -> FullResults:
+    ...
+
+  @overload
+  async def full_results_query(
+    self,
+    input: str,
+    *,
+    location: str,
+    format: Optional[Sequence[str, ...]] = None,
+    podindex: Optional[Sequence[int, ...]] = None,
+    reinterpret: Optional[str] = None, # TODO: Make enums
+    translation: Optional[str] = None,
+    ignorecase: Optional[str] = None,
+    assumption: Optional[str] = None,
+    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    **params
   ) -> FullResults:
     ...
 
