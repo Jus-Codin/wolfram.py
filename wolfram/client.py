@@ -11,6 +11,7 @@ if TYPE_CHECKING:
   from requests import Response
 
   from wolfram.models import FullResults, ConversationalResults, SimpleImage
+  from wolfram.params import Bool, LatLong, Units
 
 import aiohttp
 import requests
@@ -68,11 +69,11 @@ class Client(ClientBase):
     *,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -85,11 +86,11 @@ class Client(ClientBase):
     ip: str,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -99,14 +100,14 @@ class Client(ClientBase):
     self,
     input: str,
     *,
-    latlong: str, # TODO: Make latlong class
+    latlong: LatLong,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -119,11 +120,11 @@ class Client(ClientBase):
     location: str,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -260,11 +261,11 @@ class AsyncClient(ClientBase):
     *,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -277,11 +278,11 @@ class AsyncClient(ClientBase):
     ip: str,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -291,14 +292,14 @@ class AsyncClient(ClientBase):
     self,
     input: str,
     *,
-    latlong: str, # TODO: Make latlong class
+    latlong: LatLong,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
@@ -311,11 +312,11 @@ class AsyncClient(ClientBase):
     location: str,
     format: Optional[Sequence[str, ...]] = None,
     podindex: Optional[Sequence[int, ...]] = None,
-    reinterpret: Optional[str] = None, # TODO: Make enums
-    translation: Optional[str] = None,
-    ignorecase: Optional[str] = None,
+    reinterpret: Optional[Bool] = None,
+    translation: Optional[Bool] = None,
+    ignorecase: Optional[Bool] = None,
     assumption: Optional[str] = None,
-    units: Optional[Literal["metric", "nonmetric"]] = None, # TODO: Make enums
+    units: Optional[Units] = None,
     **params
   ) -> FullResults:
     ...
