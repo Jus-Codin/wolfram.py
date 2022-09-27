@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union, overload
 
 from wolfram.api import API, FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
+from wolfram.exceptions import ParameterConflict
 
 if TYPE_CHECKING:
   from aiohttp import ClientResponse
@@ -48,13 +49,15 @@ class Client(ClientBase):
 
     api_version = self.API_VERSION[api.VERSION]
 
-    params = "?" + urlencode(
-      tuple(
-        # Potential exception could be caused here if user passes a parameter specified by the API
-        # TODO: Implement try except statement here
-        dict(appid=self.appid, **api.PARAMS, **params).items()
+    try:
+      params = "?" + urlencode(
+        tuple(
+          dict(appid=self.appid, **api.PARAMS, **params).items()
+        )
       )
-    )
+    except TypeError:
+      raise ParameterConflict("cannot pass a parameter specified by `API` object")
+
     base_url = url if url is not None else self.BASE_URL
     url = base_url + api_version + api.ENDPOINT + params
     resp = requests.get(url)
@@ -238,13 +241,15 @@ class AsyncClient(ClientBase):
 
     api_version = self.API_VERSION[api.VERSION]
 
-    params = "?" + urlencode(
-      tuple(
-        # Potential exception could be caused here if user passes a parameter specified by the API
-        # TODO: Implement try except statement here
-        dict(appid=self.appid, **api.PARAMS, **params).items()
+    try:
+      params = "?" + urlencode(
+        tuple(
+          dict(appid=self.appid, **api.PARAMS, **params).items()
+        )
       )
-    )
+    except TypeError:
+      raise ParameterConflict("cannot pass a parameter specified by `API` object")
+      
     base_url = url if url is not None else self.BASE_URL
     url = base_url + api_version + api.ENDPOINT + params
     async with aiohttp.ClientSession() as client:
