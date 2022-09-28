@@ -40,7 +40,7 @@ from wolfram.types import (
   ErrorDict,
   SourceDict
 )
-from wolfram.utils import optional_factory, list_map_factory, always_list_factory
+from wolfram.factory import optional_factory, list_map_factory, always_list_factory
 
 if TYPE_CHECKING:
   from dataclasses import Field
