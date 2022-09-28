@@ -154,7 +154,17 @@ class ConversationalAPI(API):
         raise WolframException(resp.text) # This should not happen
 
     raw = resp.json()
-    return ConversationalResults.from_dict(raw)
+
+    if raw.get("conversationID") is None: # This is a little bit of hard coding, might be reworked
+      error = raw.get("error")
+      if error == "No result is available":
+        raise InterpretationError("input was unable to be interpreted by the API")
+      elif error == "No input.":
+        raise MissingParameters("input parameter was not found")
+      else:
+        raise WolframException(error) # Worse case scenario
+    else:
+      return ConversationalResults.from_dict(raw)
 
   async def async_format_results(resp: ClientResponse) -> ConversationalResults:
     if resp.status == 403:
