@@ -501,18 +501,25 @@ class ConversationalResults(Model[ConversationalResultsDict]):
   error: Optional[str] = optional_field(factory=str)
 
   @property
-  def followup_url(self) -> str:
-    """The url to send a follow up request to.
-    Note that this is meant to be passed to `Client.query_conversational`"""
-    return f"https://{self.host}/api/"
+  def is_error(self):
+    """If the result is an error"""
+    return self.error is not None
 
   @property
-  def followup_params(self) -> dict:
+  def followup_url(self) -> Optional[str]:
+    """The url to send a follow up request to.
+    Note that this is meant to be passed to `Client.query_conversational`"""
+    if not self.is_error:
+      return f"https://{self.host}/api/"
+
+  @property
+  def followup_params(self) -> Optional[dict]:
     """A dictionary of parameters that should be sent with the follow up request"""
-    d = dict(conversationID=self.conversationID)
-    if self.s is not None:
-      d["s"] = self.s
-    return d
+    if not self.is_error:
+      d = dict(conversationID=self.conversationID)
+      if self.s is not None:
+        d["s"] = self.s
+      return d
 
 
 
