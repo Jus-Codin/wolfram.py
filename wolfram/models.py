@@ -506,20 +506,18 @@ class ConversationalResults(Model[ConversationalResultsDict]):
     return self.error is not None
 
   @property
-  def followup_url(self) -> Optional[str]:
+  def followup_url(self) -> str:
     """The url to send a follow up request to.
     Note that this is meant to be passed to `Client.query_conversational`"""
-    if not self.is_error:
-      return f"https://{self.host}/api/"
+    return f"https://{self.host}/api/"
 
   @property
-  def followup_params(self) -> Optional[dict]:
+  def followup_params(self) -> dict:
     """A dictionary of parameters that should be sent with the follow up request"""
-    if not self.is_error:
-      d = dict(conversationID=self.conversationID)
-      if self.s is not None:
-        d["s"] = self.s
-      return d
+    d = dict(conversationID=self.conversationID)
+    if self.s is not None:
+      d["s"] = self.s
+    return d
 
 
 
