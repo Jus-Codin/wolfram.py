@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from wolfram.exceptions import InterpretationError, MissingParameters, InvalidAppID, WolframException
 from wolfram.models import ConversationalResults, FullResults, Model, SimpleImage
 
 from typing import TYPE_CHECKING, Any, Dict, Optional
@@ -43,9 +44,31 @@ class SimpleAPI(API):
   ENDPOINT = "simple"
 
   def format_results(resp: Response) -> SimpleImage:
+    if resp.status_code == 501:
+      raise InterpretationError("input was unable to be interpreted by the API")
+    elif resp.status_code == 400:
+      raise MissingParameters("input parameter was not found")
+    elif resp.status_code == 403:
+      # In this case it is likely an invalid app id
+      if resp.text == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(resp.text) # This should not happen
+
     return SimpleImage(resp.content)
 
   async def async_format_results(resp: ClientResponse) -> SimpleImage:
+    if resp.status == 501:
+      raise InterpretationError("input was unable to be interpreted by the API")
+    elif resp.status == 400:
+      raise MissingParameters("input parameter was not found")
+    elif resp.status == 403:
+      # In this case it is likely an invalid app id
+      if await resp.text() == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(await resp.text()) # This should not happen
+
     return SimpleImage(await resp.read())
 
 
@@ -55,9 +78,31 @@ class ShortAPI(API):
   ENDPOINT = "result"
 
   def format_results(resp: Response) -> str:
+    if resp.status_code == 501:
+      raise InterpretationError("input was unable to be interpreted by the API")
+    elif resp.status_code == 400:
+      raise MissingParameters("input parameter was not found")
+    elif resp.status_code == 403:
+      # In this case it is likely an invalid app id
+      if resp.text == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(resp.text) # This should not happen
+
     return resp.text
 
   async def async_format_results(resp: ClientResponse) -> str:
+    if resp.status == 501:
+      raise InterpretationError("input was unable to be interpreted by the API")
+    elif resp.status == 400:
+      raise MissingParameters("input parameter was not found")
+    elif resp.status == 403:
+      # In this case it is likely an invalid app id
+      if await resp.text() == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(await resp.text()) # This should not happen
+
     return await resp.text()
 
 
@@ -67,9 +112,31 @@ class SpokenAPI(API):
   ENDPOINT = "spoken"
 
   def format_results(resp: Response) -> str:
+    if resp.status_code == 501:
+      raise InterpretationError("input was unable to be interpreted by the API")
+    elif resp.status_code == 400:
+      raise MissingParameters("input parameter was not found")
+    elif resp.status_code == 403:
+      # In this case it is likely an invalid app id
+      if resp.text == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(resp.text) # This should not happen
+
     return resp.text
 
   async def async_format_results(resp: ClientResponse) -> str:
+    if resp.status == 501:
+      raise InterpretationError("input was unable to be interpreted by the API")
+    elif resp.status == 400:
+      raise MissingParameters("input parameter was not found")
+    elif resp.status == 403:
+      # In this case it is likely an invalid app id
+      if await resp.text == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(await resp.text) # This should not happen
+
     return await resp.text()
 
 
@@ -79,9 +146,23 @@ class ConversationalAPI(API):
   ENDPOINT = "conversation.jsp"
 
   def format_results(resp: Response) -> ConversationalResults:
+    if resp.status_code == 403:
+      # In this case it is likely an invalid app id
+      if resp.text == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(resp.text) # This should not happen
+
     raw = resp.json()
     return ConversationalResults.from_dict(raw)
 
   async def async_format_results(resp: ClientResponse) -> ConversationalResults:
+    if resp.status == 403:
+      # In this case it is likely an invalid app id
+      if await resp.text == "Error 1: Invalid appid":
+        raise InvalidAppID("App ID was invalid")
+      else:
+        raise WolframException(await resp.text) # This should not happen
+
     raw = await resp.json()
     return ConversationalResults.from_dict(raw)
