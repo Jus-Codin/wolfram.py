@@ -134,33 +134,36 @@ class Client(ClientBase):
     ...
 
   def full_results_query(self, input: str, **params) -> FullResults:
-    """Send a query to the Wolfram|Alpha v2.0 API
+    """Send a query to the Wolfram|Alpha FullResults API.
     
     Parameters
     ----------
-    input: str
-      The input string to be interpreted
-    ip: str
-      Specifies a custom query location based on an IP address
+    input: `str`
+      The input string to be interpreted.
+    ip: `str`
+      Specifies a custom query location based on an IP address.
     latlong: :class:`~wolfram.LatLong`
-      Specifies a custom query location based on a latitude/longitude pair
-    location: str
-      Specifies a custom query location based on a string
-    format: Optional[Sequence[str, ...]]
+      Specifies a custom query location based on a latitude/longitude pair.
+    location: `str`
+      Specifies a custom query location based on a string.
+    format: Optional[Sequence[`str`, `...`]]
       The desired format for individual result pods.
-      Note that MathML is disabled by default
-    podindex: Optional[Sequence[int, ...]]
-      Specifies the index(es) of the pod(s) to return
+      Note that MathML is disabled by default.
+    podindex: Optional[Sequence[`int`, `...`]]
+      Specifies the index(es) of the pod(s) to return.
     reinterpret: Optional[:class:`~wolfram.Bool`]
-      Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood
+      Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood.
     translation: Optional[:class:`~wolfram.Bool`]
-      Whether to allow Wolfram|Alpha to try to translate simple queries into English
+      Whether to allow Wolfram|Alpha to try to translate simple queries into English.
     ignorecase: Optional[:class:`~wolfram.Bool`]
-      Whether to force Wolfram|Alpha to ignore case in queries
-    assumption: Optional[str]
-      Specifies an assumption, such as the meaning of a word or the value of a formula variable
+      Whether to force Wolfram|Alpha to ignore case in queries.
+    assumption: Optional[`str`]
+      Specifies an assumption, such as the meaning of a word or the value of a formula variable.
     units: Optional[:class:`~wolfram.Units`]
-      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units)
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    \*\*params
+      A keyword argument list of other parameters to be passed to the API.
+      All parameters can be found at https://products.wolframalpha.com/api/documentation?scrollTo=parameter-reference.
     """
 
     # For some reason unlike the other APIs the FullResults API units parameter is metric or nonmetric
@@ -181,7 +184,7 @@ class Client(ClientBase):
     self,
     i: str,
     *,
-    geolocation: Optional[str] = None,
+    geolocation: Optional[LatLong] = None,
     ip: Optional[str] = None,
     units: Optional[Units] = None
   ) -> ConversationalResults:
@@ -195,13 +198,54 @@ class Client(ClientBase):
     conversationalID: str,
     url: str,
     s: Optional[int] = None,
-    geolocation: Optional[str] = None,
+    geolocation: Optional[LatLong] = None,
     ip: Optional[str] = None,
     units: Optional[Units] = None
   ) -> ConversationalResults:
     ...
 
   def conversational_query(self, i: str, **params) -> ConversationalResults:
+    """Send a query to the Wolfram|Alpha Conversational API.
+
+    When queried, it returns a result along with a conversational ID,
+    which allows follow-up queries to use.
+    For more information, refer to https://products.wolframalpha.com/conversational-api/documentation/.
+    
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted.
+    conversationalID: Optional[`str`]
+      The ID used for follow-up queries.
+    url: Optional[`str`]
+      The host url to send follow-up queries to.
+      If a conversational ID is provided, this parameter must be present as well.
+    s: Optional[`int`]
+      A special identifier parameter that is used for follow-up queries.
+      This parameter is only returned in rare cases, but must be provided when given.
+    geolocation: Optional[:class:`~wolfram.LatLong`]
+      Specifies a custom query location based on a latitude/longitude pair.
+    ip: Optional[`str`]
+      Specifies a custom query location based on an IP address.
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    ~wolfram.MissingParameters
+      A required parameter was not specified for a follow-up query.
+    """
+    convID = params.get("conversationalID", None)
+    url = params.get("url", None)
+    if convID is not None and url is None:
+      raise MissingParameters("missing required parameter `url`.")
+    if url is not None and convID is None:
+      raise MissingParameters("missing required parameter `conversationID`.")
+
     return self.query(api=ConversationalAPI, i=i, **params)
 
   @overload
@@ -217,6 +261,28 @@ class Client(ClientBase):
     ...
 
   def conversational_followup_query(self, i: str, result: ConversationalResults, **params):
+    """Convenience method to send a follow-up query using a `~wolfarm.ConversationalResults` object
+    
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted.
+    result: :class:`~wolfram.ConversationalResults`
+      The query result that the follow-up query is based on.
+    geolocation: Optional[:class:`~wolfram.LatLong`]
+      Specifies a custom query location based on a latitude/longitude pair.
+    ip: Optional[`str`]
+      Specifies a custom query location based on an IP address.
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return self.conversational_query(i=i, url=result.followup_url, **result.followup_params, **params)
 
   @overload
