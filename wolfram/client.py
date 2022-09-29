@@ -311,6 +311,54 @@ class Client(ClientBase):
     ...
 
   def simple_query(self, i: str, **params) -> SimpleImage:
+    """
+    
+    Send a query to the Wolfram|Alpha Simple API.
+
+    Built on the same technology as the FullResults API,
+    the Simple API generates full Wolfram|Alpha output in a universally viewable image format.
+
+    For more information, refer to https://products.wolframalpha.com/simple-api/documentation/.
+
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted.
+    layout: Optional[`str`]
+      Defines how content is presented. The available settings are `"divider"`
+      and `"letterbox"`. Defaults to `"divider"`.
+    background: Optional[`str`]
+      The background color of the image. Colors can be expressed as HTML
+      names (e.g. `"white"`), hexadecimal RGB values (e.g. `"00AAFF"`) or
+      comma-separated decimal RGB values (e.g. `"0,100,200"`). You can
+      also add an alpha channel to RGB values (e.g. `"0,100,200,200"`) or
+      specify `"transparent"` or `"clear"` for a transparent background.
+      Defaults to `"white"`.
+    foreground: Optional[`str`]
+      The foreground color of the image. Colors can be expressed as HTML
+      names (e.g. `"white"`), hexadecimal RGB values (e.g. `"00AAFF"`) or
+      comma-separated decimal RGB values (e.g. `"0,100,200"`). You can
+      also add an alpha channel to RGB values (e.g. `"0,100,200,200"`) or
+      specify `"transparent"` or `"clear"` for a transparent background.
+      Defaults to `"black"`.
+    fontsize: Optional[`int`]
+      Specify the display size of text elements in points, defaults to `14`.
+    width: Optional[`int`]
+      This parameter specifies the desired width (in pixels) for output images.
+      Defaults to `500`.
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    timeout: Optional[int]
+      Specifies the maximum amount of time (in seconds) allowed to process a query.
+      Defaults to `5`.
+
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return self.query(api=SimpleAPI, i=i, **params)
 
   @overload
@@ -559,7 +607,7 @@ class AsyncClient(ClientBase):
       raise MissingParameters("missing required parameter `url`.")
     if url is not None and convID is None:
       raise MissingParameters("missing required parameter `conversationID`.")
-      
+
     return await self.query(api=ConversationalAPI, i=i, **params)
   
   @overload
@@ -617,6 +665,54 @@ class AsyncClient(ClientBase):
     ...
 
   async def simple_query(self, i: str, **params) -> SimpleImage:
+    """|coro|
+    
+    Send a query to the Wolfram|Alpha Simple API.
+
+    Built on the same technology as the FullResults API,
+    the Simple API generates full Wolfram|Alpha output in a universally viewable image format.
+
+    For more information, refer to https://products.wolframalpha.com/simple-api/documentation/.
+
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted.
+    layout: Optional[`str`]
+      Defines how content is presented. The available settings are `"divider"`
+      and `"letterbox"`. Defaults to `"divider"`.
+    background: Optional[`str`]
+      The background color of the image. Colors can be expressed as HTML
+      names (e.g. `"white"`), hexadecimal RGB values (e.g. `"00AAFF"`) or
+      comma-separated decimal RGB values (e.g. `"0,100,200"`). You can
+      also add an alpha channel to RGB values (e.g. `"0,100,200,200"`) or
+      specify `"transparent"` or `"clear"` for a transparent background.
+      Defaults to `"white"`.
+    foreground: Optional[`str`]
+      The foreground color of the image. Colors can be expressed as HTML
+      names (e.g. `"white"`), hexadecimal RGB values (e.g. `"00AAFF"`) or
+      comma-separated decimal RGB values (e.g. `"0,100,200"`). You can
+      also add an alpha channel to RGB values (e.g. `"0,100,200,200"`) or
+      specify `"transparent"` or `"clear"` for a transparent background.
+      Defaults to `"black"`.
+    fontsize: Optional[`int`]
+      Specify the display size of text elements in points, defaults to `14`.
+    width: Optional[`int`]
+      This parameter specifies the desired width (in pixels) for output images.
+      Defaults to `500`.
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    timeout: Optional[int]
+      Specifies the maximum amount of time (in seconds) allowed to process a query.
+      Defaults to `5`.
+
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return await self.query(api=SimpleAPI, i=i, **params)
 
   @overload
