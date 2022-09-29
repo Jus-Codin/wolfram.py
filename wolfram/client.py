@@ -6,13 +6,14 @@ from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Unio
 
 from wolfram.api import API, FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
 from wolfram.exceptions import ParameterConflict
+from wolfram.params import Units
 
 if TYPE_CHECKING:
   from aiohttp import ClientResponse
   from requests import Response
 
   from wolfram.models import FullResults, ConversationalResults, SimpleImage
-  from wolfram.params import Bool, LatLong, Units
+  from wolfram.params import Bool, LatLong
 
 import aiohttp
 import requests
@@ -133,7 +134,43 @@ class Client(ClientBase):
     ...
 
   def full_results_query(self, input: str, **params) -> FullResults:
+    """Send a query to the Wolfram|Alpha v2.0 API
+    
+    Parameters
+    ----------
+    input: str
+      The input string to be interpreted
+    ip: str
+      Specifies a custom query location based on an IP address
+    latlong: :class:`~wolfram.LatLong`
+      Specifies a custom query location based on a latitude/longitude pair
+    location: str
+      Specifies a custom query location based on a string
+    format: Optional[Sequence[str, ...]]
+      The desired format for individual result pods.
+      Note that MathML is disabled by default
+    podindex: Optional[Sequence[int, ...]]
+      Specifies the index(es) of the pod(s) to return
+    reinterpret: Optional[:class:`~wolfram.Bool`]
+      Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood
+    translation: Optional[:class:`~wolfram.Bool`]
+      Whether to allow Wolfram|Alpha to try to translate simple queries into English
+    ignorecase: Optional[:class:`~wolfram.Bool`]
+      Whether to force Wolfram|Alpha to ignore case in queries
+    assumption: Optional[str]
+      Specifies an assumption, such as the meaning of a word or the value of a formula variable
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units)
+    """
+
+    # For some reason unlike the other APIs the FullResults API units parameter is metric or nonmetric
+    # instead of imperial, so we'll just do a replace if it is imperial
+    units = params.get("units", None)
+    if units is not None and units == Units.IMPERIAL:
+      params["units"] == "nonmetric"
+
     format = params.pop("format", None)
+
     if format is not None:
       return self.query(api=FullResultsAPI, input=input, format=",".join(format), **params)
     else:
