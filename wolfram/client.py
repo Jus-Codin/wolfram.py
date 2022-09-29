@@ -135,6 +135,10 @@ class Client(ClientBase):
 
   def full_results_query(self, input: str, **params) -> FullResults:
     """Send a query to the Wolfram|Alpha FullResults API.
+
+    The API allows clients to submit free-form queries similar to the queries
+    one might enter at the Wolfram|Alpha website,and for the computed results
+    to be returned in a variety of formats.
     
     Parameters
     ----------
@@ -207,8 +211,8 @@ class Client(ClientBase):
   def conversational_query(self, i: str, **params) -> ConversationalResults:
     """Send a query to the Wolfram|Alpha Conversational API.
 
-    When queried, it returns a result along with a conversational ID,
-    which allows follow-up queries to use.
+    The Conversational API returns a text result phrased in full sentence form,
+    along with a token for making a related follow-up query.
     For more information, refer to https://products.wolframalpha.com/conversational-api/documentation/.
     
     Parameters
