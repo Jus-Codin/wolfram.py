@@ -10,7 +10,7 @@ from typing import (
   Generic,
   Mapping,
   Optional,
-  Sequence,
+  List,
   TYPE_CHECKING,
   TypeVar
 )
@@ -160,7 +160,7 @@ class Image(Model[ImageDict]):
   src: WolframURL = model_field(
     factory=WolframURL
   )
-  themes: Sequence[int, ...] = model_field(
+  themes: List[int, ...] = model_field(
     factory=lambda seq: [
       int(ele) for ele in seq.split(",")
     ]
@@ -201,7 +201,7 @@ class AssumptionsCollection(Model[AssumptionsDict]):
   type: str
   template: str
   count: int
-  values: Sequence[Assumption, ...] = model_field(
+  values: List[Assumption, ...] = model_field(
     factory=list_map_factory(
       Assumption.from_dict
     )
@@ -278,7 +278,7 @@ class ReinterpretWarning(Warning[ReinterpretWarningDict]):
   new: str
   level: str
   score: float = model_field(factory=float)
-  alternative: Sequence[Alternative, ...] = model_field(
+  alternative: List[Alternative, ...] = model_field(
     factory=always_list_factory(
       Alternative.from_dict
     )
@@ -365,7 +365,7 @@ class Pod(Model[PodDict]):
   position: int
   id: str
   numsubpods: int
-  subpods: Sequence[SubPod, ...] = model_field(
+  subpods: List[SubPod, ...] = model_field(
     factory=list_map_factory(
       SubPod.from_dict
     )
@@ -395,7 +395,7 @@ class FullResults(Model[FullResultsDict]):
   id: str
   host: str
 
-  tips: Optional[Sequence[Tip, ...]] = optional_field(
+  tips: Optional[List[Tip, ...]] = optional_field(
     factory=always_list_factory(
       Tip.from_dict
     )
@@ -407,7 +407,7 @@ class FullResults(Model[FullResultsDict]):
       match=""
     )
   )
-  pods: Optional[Sequence[Pod, ...]] = optional_field(
+  pods: Optional[List[Pod, ...]] = optional_field(
     factory=list_map_factory(
       Pod.from_dict
     )
@@ -416,7 +416,7 @@ class FullResults(Model[FullResultsDict]):
   warnings: Optional[Warning] = optional_field(
     factory=Warning.to_subclass
   )
-  sources: Optional[Sequence[Source]] = optional_field(
+  sources: Optional[List[Source]] = optional_field(
     factory=always_list_factory(
       Source.from_dict
     )
@@ -434,7 +434,7 @@ class FullResults(Model[FullResultsDict]):
   generalization: Optional[Generalization] = optional_field(
     factory=Generalization.from_dict
   )
-  didyoumeans: Optional[Sequence[DidYouMean]] = optional_field(
+  didyoumeans: Optional[List[DidYouMean]] = optional_field(
     factory=always_list_factory(
       DidYouMean.from_dict
     )

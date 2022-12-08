@@ -348,7 +348,7 @@ class Client(ClientBase):
       Defaults to `500`.
     units: Optional[:class:`~wolfram.Units`]
       Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
-    timeout: Optional[int]
+    timeout: Optional[`int`]
       Specifies the maximum amount of time (in seconds) allowed to process a query.
       Defaults to `5`.
 
@@ -372,6 +372,32 @@ class Client(ClientBase):
     ...
 
   def short_query(self, i: str, **params) -> str:
+    """
+    
+    Send a query to the Wolfram|Alpha Short Answers API
+
+    The Short Answers API returns a single plain text result directly from Wolfram|Alpha.
+    In general, this text is taken directly from the Result pod of Wolfram|Alpha output.
+
+    For more information, refer to https://products.wolframalpha.com/short-answers-api/documentation
+
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    timeout: Optional[`int`]
+      Specifies the maximum amount of time (in seconds) allowed to process a query.
+      Defaults to `5`.
+    
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return self.query(api=ShortAPI, i=i, **params)
 
   @overload
@@ -385,6 +411,31 @@ class Client(ClientBase):
     ...
   
   def spoken_query(self, i: str, **params) -> str:
+    """
+    
+    Send a query to the Wolfram|Alpha Spoken API
+
+    The Spoken Results API returns text results phrased in full sentence form.
+
+    For more information, refer to https://products.wolframalpha.com/spoken-results-api/documentation
+    
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    timeout: Optional[`int`]
+      Specifies the maximum amount of time (in seconds) allowed to process a query.
+      Defaults to `5`.
+
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return self.query(api=SpokenAPI, i=i, **params)
 
 
@@ -726,6 +777,32 @@ class AsyncClient(ClientBase):
     ...
 
   async def short_query(self, i: str, **params) -> str:
+    """|coro|
+    
+    Send a query to the Wolfram|Alpha Short Answers API
+
+    The Short Answers API returns a single plain text result directly from Wolfram|Alpha.
+    In general, this text is taken directly from the Result pod of Wolfram|Alpha output.
+
+    For more information, refer to https://products.wolframalpha.com/short-answers-api/documentation
+
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    timeout: Optional[`int`]
+      Specifies the maximum amount of time (in seconds) allowed to process a query.
+      Defaults to `5`.
+    
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return await self.query(api=ShortAPI, i=i, **params)
 
   @overload
@@ -739,4 +816,29 @@ class AsyncClient(ClientBase):
     ...
   
   async def spoken_query(self, i: str, **params) -> str:
+    """|coro|
+    
+    Send a query to the Wolfram|Alpha Spoken API
+
+    The Spoken Results API returns text results phrased in full sentence form.
+
+    For more information, refer to https://products.wolframalpha.com/spoken-results-api/documentation
+    
+    Parameters
+    ----------
+    i: `str`
+      The input string to be interpreted
+    units: Optional[:class:`~wolfram.Units`]
+      Lets you specify the preferred measurement system, either "metric" or "imperial" (US customary units).
+    timeout: Optional[`int`]
+      Specifies the maximum amount of time (in seconds) allowed to process a query.
+      Defaults to `5`.
+
+    Raises
+    ------
+    ~wolfram.InterpretationError
+      Input was unable to be interpreted by the API.
+    ~wolfram.InvalidAppID
+      The app ID supplied to the client is invalid.
+    """
     return await self.query(api=SpokenAPI, i=i, **params)
