@@ -35,8 +35,8 @@ Additionally, the current library does not have any error handling so it is some
 The Full Results and Conversational API on the standard Client has been tested for the most part, and I cannot guarantee that the other APIs will work at all. If you find any bugs with the library, please open an issue. Assistance with debugging would be greatly appreciated
 
 ### List of things left to do:
-- [ ] Implement custom exceptions and error handling to tell users what went wrong
+- [x] Implement custom exceptions and error handling to tell users what went wrong
 - [ ] More potential bug fixing
-- [ ] Complete type hinting and docstring
+- [x] Complete type hinting and docstring
 - [ ] Potentially create documentation
 - [ ] Setup files for uploading to pypi.org
