@@ -160,7 +160,7 @@ class Image(Model[ImageDict]):
   src: WolframURL = model_field(
     factory=WolframURL
   )
-  themes: List[int, ...] = model_field(
+  themes: List[int] = model_field(
     factory=lambda seq: [
       int(ele) for ele in seq.split(",")
     ]
@@ -201,7 +201,7 @@ class AssumptionsCollection(Model[AssumptionsDict]):
   type: str
   template: str
   count: int
-  values: List[Assumption, ...] = model_field(
+  values: List[Assumption] = model_field(
     factory=list_map_factory(
       Assumption.from_dict
     )
@@ -278,7 +278,7 @@ class ReinterpretWarning(Warning[ReinterpretWarningDict]):
   new: str
   level: str
   score: float = model_field(factory=float)
-  alternative: List[Alternative, ...] = model_field(
+  alternative: List[Alternative] = model_field(
     factory=always_list_factory(
       Alternative.from_dict
     )
@@ -365,7 +365,7 @@ class Pod(Model[PodDict]):
   position: int
   id: str
   numsubpods: int
-  subpods: List[SubPod, ...] = model_field(
+  subpods: List[SubPod] = model_field(
     factory=list_map_factory(
       SubPod.from_dict
     )
@@ -395,7 +395,7 @@ class FullResults(Model[FullResultsDict]):
   id: str
   host: str
 
-  tips: Optional[List[Tip, ...]] = optional_field(
+  tips: Optional[List[Tip]] = optional_field(
     factory=always_list_factory(
       Tip.from_dict
     )
@@ -407,7 +407,7 @@ class FullResults(Model[FullResultsDict]):
       match=""
     )
   )
-  pods: Optional[List[Pod, ...]] = optional_field(
+  pods: Optional[List[Pod]] = optional_field(
     factory=list_map_factory(
       Pod.from_dict
     )

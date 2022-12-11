@@ -25,13 +25,13 @@ class FullResultsDict(WolframDict):
   id: str
   host: str
 
-  pods: Sequence[PodDict, ...]
+  pods: Sequence[PodDict]
 
   assumptions: AssumptionsDict
 
   warnings: Union[
     Sequence[
-      Union[SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict], ...
+      Union[SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict]
     ],
     SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict
   ]
@@ -49,7 +49,7 @@ class FullResultsDict(WolframDict):
   examplepage: ExamplePageDict
   generalization: GeneralizationDict
   didyoumeans: Union[
-    Sequence[DidYouMeanDict, ...],
+    Sequence[DidYouMeanDict],
     DidYouMeanDict
   ]
 
@@ -71,7 +71,7 @@ class PodDict(WolframDict):
   position: int
   id: str
   numsubpods: int
-  subpods: Sequence[SubPodDict, ...]
+  subpods: Sequence[SubPodDict]
 
 
 
@@ -107,7 +107,7 @@ class AssumptionsDict(WolframDict):
   word: str
   template: str
   count: int
-  values: Sequence[AssumptionDict, ...]
+  values: Sequence[AssumptionDict]
 
 class AssumptionDict(WolframDict):
   name: str
@@ -145,7 +145,7 @@ class ReinterpretWarningDict(WarningDict):
   alternative: Optional[
     Union[
       Sequence[
-        AlternativeDict, ...
+        AlternativeDict
       ],
       AlternativeDict
     ]
