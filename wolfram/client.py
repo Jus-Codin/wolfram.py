@@ -1,22 +1,19 @@
 from __future__ import annotations
 
-from json import JSONDecodeError
+from typing import TYPE_CHECKING, Optional, Sequence, overload
 from urllib.parse import urlencode
-from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union, overload
 
-from wolfram.api import API, FullResultsAPI, SimpleAPI, ShortAPI, SpokenAPI, ConversationalAPI
-from wolfram.exceptions import ParameterConflict
+from wolfram.api import API, ConversationalAPI, FullResultsAPI, ShortAPI, SimpleAPI, SpokenAPI
+from wolfram.exceptions import MissingParameters, ParameterConflict
 from wolfram.params import Units
 
 if TYPE_CHECKING:
-  from aiohttp import ClientResponse
-  from requests import Response
-
   from wolfram.models import FullResults, ConversationalResults, SimpleImage
   from wolfram.params import Bool, LatLong
 
 import aiohttp
 import requests
+
 
 class ClientBase:
   """The base class of Clients"""
@@ -46,7 +43,7 @@ class Client(ClientBase):
 
 
     if api.VERSION not in self.API_VERSION.keys():
-      raise ValueError(f"Unknown API version '{request.version}'.")
+      raise ValueError(f"Unknown API version '{api.VERSION}'.")
 
     api_version = self.API_VERSION[api.VERSION]
 
@@ -71,8 +68,8 @@ class Client(ClientBase):
     self,
     input: str,
     *,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -88,8 +85,8 @@ class Client(ClientBase):
     input: str,
     *,
     ip: str,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -105,8 +102,8 @@ class Client(ClientBase):
     input: str,
     *,
     latlong: LatLong,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -122,8 +119,8 @@ class Client(ClientBase):
     input: str,
     *,
     location: str,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -152,10 +149,10 @@ class Client(ClientBase):
       Specifies a custom query location based on a latitude/longitude pair.
     location: `str`
       Specifies a custom query location based on a string.
-    format: Optional[Sequence[`str`, `...`]]
+    format: Optional[Sequence[`str`]]
       The desired format for individual result pods.
       Note that MathML is disabled by default.
-    podindex: Optional[Sequence[`int`, `...`]]
+    podindex: Optional[Sequence[`int`]]
       Specifies the index(es) of the pod(s) to return.
     reinterpret: Optional[:class:`~wolfram.Bool`]
       Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood.
@@ -449,7 +446,7 @@ class AsyncClient(ClientBase):
 
 
     if api.VERSION not in self.API_VERSION.keys():
-      raise ValueError(f"Unknown API version '{request.version}'.")
+      raise ValueError(f"Unknown API version '{api.VERSION}'.")
 
     api_version = self.API_VERSION[api.VERSION]
 
@@ -476,8 +473,8 @@ class AsyncClient(ClientBase):
     self,
     input: str,
     *,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -493,8 +490,8 @@ class AsyncClient(ClientBase):
     input: str,
     *,
     ip: str,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -510,8 +507,8 @@ class AsyncClient(ClientBase):
     input: str,
     *,
     latlong: LatLong,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -527,8 +524,8 @@ class AsyncClient(ClientBase):
     input: str,
     *,
     location: str,
-    format: Optional[Sequence[str, ...]] = None,
-    podindex: Optional[Sequence[int, ...]] = None,
+    format: Optional[Sequence[str]] = None,
+    podindex: Optional[Sequence[int]] = None,
     reinterpret: Optional[Bool] = None,
     translation: Optional[Bool] = None,
     ignorecase: Optional[Bool] = None,
@@ -557,10 +554,10 @@ class AsyncClient(ClientBase):
       Specifies a custom query location based on a latitude/longitude pair.
     location: `str`
       Specifies a custom query location based on a string.
-    format: Optional[Sequence[`str`, `...`]]
+    format: Optional[Sequence[`str`]]
       The desired format for individual result pods.
       Note that MathML is disabled by default.
-    podindex: Optional[Sequence[`int`, `...`]]
+    podindex: Optional[Sequence[`int`]]
       Specifies the index(es) of the pod(s) to return.
     reinterpret: Optional[:class:`~wolfram.Bool`]
       Whether to allow Wolfram|Alpha to reinterpret queries that would otherwise not be understood.
