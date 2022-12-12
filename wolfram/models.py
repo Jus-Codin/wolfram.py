@@ -413,8 +413,10 @@ class FullResults(Model[FullResultsDict]):
     )
   )  
   
-  warnings: Optional[Warning] = optional_field(
-    factory=Warning.to_subclass
+  warnings: Optional[List[Warning]] = optional_field(
+    factory=always_list_factory(
+      Warning.to_subclass
+    )
   )
   sources: Optional[List[Source]] = optional_field(
     factory=always_list_factory(
