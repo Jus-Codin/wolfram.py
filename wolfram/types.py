@@ -6,7 +6,7 @@ This might be removed in the future
 
 from __future__ import annotations
 
-from typing import Literal, Mapping, Optional, Sequence, TypedDict, Union
+from typing import Literal, List, Mapping, Optional, TypedDict, Union
 
 class WolframDict(TypedDict):
   pass
@@ -25,19 +25,19 @@ class FullResultsDict(WolframDict):
   id: str
   host: str
 
-  pods: Sequence[PodDict]
+  pods: List[PodDict]
 
   assumptions: AssumptionsDict
 
   warnings: Union[
-    Sequence[
+    List[
       Union[SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict]
     ],
     SpellCheckWarningDict, DelimiterWarningDict, TranslationWarningDict
   ]
 
   sources: Union[
-    Sequence[
+    List[
       SourceDict
     ],
     SourceDict
@@ -49,7 +49,7 @@ class FullResultsDict(WolframDict):
   examplepage: ExamplePageDict
   generalization: GeneralizationDict
   didyoumeans: Union[
-    Sequence[DidYouMeanDict],
+    List[DidYouMeanDict],
     DidYouMeanDict
   ]
 
@@ -71,7 +71,7 @@ class PodDict(WolframDict):
   position: int
   id: str
   numsubpods: int
-  subpods: Sequence[SubPodDict]
+  subpods: List[SubPodDict]
 
 
 
@@ -107,7 +107,7 @@ class AssumptionsDict(WolframDict):
   word: str
   template: str
   count: int
-  values: Sequence[AssumptionDict]
+  values: List[AssumptionDict]
 
 class AssumptionDict(WolframDict):
   name: str
@@ -144,7 +144,7 @@ class ReinterpretWarningDict(WarningDict):
   level: str
   alternative: Optional[
     Union[
-      Sequence[
+      List[
         AlternativeDict
       ],
       AlternativeDict
