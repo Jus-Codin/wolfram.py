@@ -12,7 +12,8 @@ from typing import (
   Optional,
   List,
   TYPE_CHECKING,
-  TypeVar
+  TypeVar,
+  Union
 )
 
 from wolfram.types import (
@@ -213,6 +214,14 @@ class AssumptionsCollection(Model[AssumptionsDict]):
 
   def __iter__(self):
     return iter(self.values)
+
+  def __getitem__(self, index: Union[int, slice]) -> Assumption:
+    return self.values[index]
+
+  @property
+  def description(self):
+    """The default description of the assumption"""
+    return self.values[0].desc
 
   @property
   def text(self):
