@@ -441,7 +441,7 @@ class AsyncClient(ClientBase):
   """Async client to interact with the APIs, powered by aiohttp"""
 
   async def query(self, api: API, url: Optional[str] = None, **params):
-    if not isinstance(api, API):
+    if not issubclass(api, API):
       raise TypeError("api must be `API` type")
 
 
