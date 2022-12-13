@@ -59,6 +59,12 @@ class WolframURL:
       url, self._query = url[0], None
     self._path = url.replace("\/", "/")
 
+  def __str__(self):
+    return self.url
+
+  def __repr__(self):
+    return f"WolframURL(url={self.url})"
+
   @property
   def path(self) -> str:
     return self._path
@@ -312,6 +318,10 @@ class LanguageMsg(Model[LanguageMsgDict]):
   english: str
   other: str
 
+  @property
+  def msg(self):
+    return f"{self.english}\n{self.other}"
+
 @dataclass
 class FutureTopic(Model[FutureTopicDict]):
   topic: str
@@ -498,7 +508,7 @@ class FullResults(Model[FullResultsDict]):
   def fallthrough(self):
     """Returns a fallthrough result, if any"""
     return (
-      self.languagemsg or self.futuretopic or self.examplepage or self.generalization or self.didyoumeans
+      self.languagemsg or self.futuretopic or self.examplepage  or self.didyoumeans
     )
 
 
