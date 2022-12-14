@@ -6,7 +6,7 @@ This might be removed in the future
 
 from __future__ import annotations
 
-from typing import Literal, List, Mapping, Optional, TypedDict, Union
+from typing import Literal, List, Optional, TypedDict, Union
 
 class WolframDict(TypedDict):
   pass
@@ -27,7 +27,7 @@ class FullResultsDict(WolframDict):
 
   pods: List[PodDict]
 
-  assumptions: AssumptionsDict
+  assumptions: List[AssumptionsDict]
 
   warnings: Union[
     List[
