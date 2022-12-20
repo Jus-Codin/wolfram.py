@@ -30,9 +30,7 @@ APIs that are to be implemented:
 ## - Update 26/9/2022
 All APIs have been implemented. However, docstrings and some type hinting is incomplete.
 
-Additionally, the current library does not have any error handling so it is somewhat difficult to debug it
-
-The Full Results and Conversational API on the standard Client has been tested for the most part, and I cannot guarantee that the other APIs will work at all. If you find any bugs with the library, please open an issue. Assistance with debugging would be greatly appreciated
+If you find any bugs with the library, please open an issue. Assistance with debugging would be greatly appreciated
 
 ### List of things left to do:
 - [x] Implement custom exceptions and error handling to tell users what went wrong
