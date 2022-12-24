@@ -477,7 +477,7 @@ class FullResults(Model[FullResultsDict]):
 
   @property
   def is_error(self) -> bool:
-    return self.error is not None
+    return self.error is not False
 
   @property
   def primary(self) -> Optional[Pod]:
@@ -504,7 +504,7 @@ class FullResults(Model[FullResultsDict]):
     A fallthrough result occurs when the API does not understand your query.
     For more information, read https://products.wolframalpha.com/api/documentation/#queries-that-are-not-understood
     """
-    return not self.success and self.error is None
+    return not self.success and not self.is_error
 
   @property
   def fallthrough(self):
