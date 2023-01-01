@@ -546,7 +546,7 @@ class ConversationalResults(Model[ConversationalResultsDict]):
 
 try:
   from PIL import Image as _Image
-  from io import StringIO
+  from io import BytesIO
 except ImportError:
   _Image = None
 
@@ -563,7 +563,7 @@ class SimpleImage:
   def get_image(self) -> _Image.Image:
     if _Image is None:
       raise Exception("pillow must be installed to convert to image")
-    return _Image.open(StringIO(self.data))
+    return _Image.open(BytesIO(self.data))
 
   def save_to(self, fp: str):
     """Saves the image to a specified file path"""
