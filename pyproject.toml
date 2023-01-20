@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wolfram.py"
+version = "1.0.0"
+authors = [{name = "Jus-Codin"}]
+license = {file = "LICENSE"}
+description = "A wrapper for the Wolfram|Alpha v1.0 and v2.0 API"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Natural Language :: English",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10"
+]
+dependencies = [
+  "requests",
+  "aiohttp"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Jus-Codin/wolfram.py"
+"Bug Tracker" = "https://github.com/Jus-Codin/wolfram.py/issues"
