@@ -16,25 +16,13 @@ print(res.primary.subpods[0].plaintext)
 
 If you do not have an API key, you can get one from https://products.wolframalpha.com/api/
 
-Note that this is still a work in progress
+## Installation
+You can install this package by running the command:
+```
+pip install wolfram.py
+```
 
-APIs that are to be implemented:
-
-
-- [x] [Full Results API](https://products.wolframalpha.com/api/documentation/)
-- [x] [Simple API](https://products.wolframalpha.com/simple-api/documentation/)
-- [x] [Short Answers API](https://products.wolframalpha.com/short-answers-api/documentation/)
-- [x] [Spoken Results API](https://products.wolframalpha.com/spoken-results-api/documentation/)
-- [x] [Conversational API](https://products.wolframalpha.com/conversational-api/documentation/)
-
-## - Update 26/9/2022
-All APIs have been implemented. However, docstrings and some type hinting is incomplete.
-
-If you find any bugs with the library, please open an issue. Assistance with debugging would be greatly appreciated
-
-### List of things left to do:
-- [x] Implement custom exceptions and error handling to tell users what went wrong
-- [ ] More potential bug fixing
-- [x] Complete type hinting and docstring
-- [ ] Potentially create documentation
-- [ ] Setup files for uploading to pypi.org
+Alternatively, install the master branch at:
+```
+pip install git+https://github.com/Jus-Codin/wolfram.py
+```
