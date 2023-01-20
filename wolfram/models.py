@@ -544,14 +544,8 @@ class ConversationalResults(Model[ConversationalResultsDict]):
 
 
 
-try:
-  from PIL import Image as _Image
-  from io import BytesIO
-except ImportError:
-  _Image = None
-
 class SimpleImage:
-  """Represents an image given via the Simple API"""
+  """Represents a GIF image given via the Simple API"""
   def __init__(self, data: bytes):
     self._data = data
 
@@ -560,12 +554,7 @@ class SimpleImage:
     """Returns the raw image data"""
     return self._data
 
-  def get_image(self) -> _Image.Image:
-    if _Image is None:
-      raise Exception("pillow must be installed to convert to image")
-    return _Image.open(BytesIO(self.data))
-
   def save_to(self, fp: str):
     """Saves the image to a specified file path"""
-    img = self.get_image()
-    img.save(fp)
+    with open(fp, "wb") as f:
+      f.write(self.data)
